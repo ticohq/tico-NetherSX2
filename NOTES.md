@@ -80,14 +80,13 @@ upstream.
 
 - Phases 1 to 3 build in CI: one NRO, renderer from the settings (Vulkan,
   OpenGL NVC0, OpenGL Zink).
-- Not yet run on hardware.
 - SD layout: `/tico/modules/nethersx2/`; data in `/tico/system/nethersx2/`
   (BIOS at its top level, `resources/`, `cheats/`, `nethersx2.ini`,
   `tico.log`); memory cards and states in the account's folders from the
   launch template; Lossless.dll in `/tico/system/lsfg/`.
 - Upstream's quick menu (L + R + Plus) still runs; its Exit goes back to tico.
 
-## Hardware test 1 (pending)
+## Hardware test 1 (2026-10-15): passed
 
 Copy `SD_CARD/tico` to the card, a PS2 BIOS into `/tico/system/nethersx2/`,
 a game into `/tico/roms/ps2/`; restart tico; start the game with tico in
@@ -96,3 +95,9 @@ Emulator shows NetherSX2's tabs, L + R + Plus > Exit returns to tico.
 Then Settings > Emulator > Video > Renderer: OpenGL (NVC0), and again with
 OpenGL (Zink/NVK); each should boot.
 Send back `/tico/system/nethersx2/tico.log` and any crash report.
+
+Result: Silent Hill 3 (USA) boots on Vulkan with core 4248; PS2 shows under
+Emulators and Consoles; the settings screen shows; Exit returns to tico with
+no crash. tico passes the account folders as
+`sdmc:/tico/saves/users/<uid>/ps2/` (same for states).
+The OpenGL renderers were not reported.
