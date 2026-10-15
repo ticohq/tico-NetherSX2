@@ -1,0 +1,72 @@
+# tico-nethersx2: working notes
+
+Goal: NetherSX2 for the Switch as a **tico module** (tico 0.8.0+), integrated
+the way the official tico cores are: tico starts it, the game runs with tico's
+in-game menu, and it returns to tico with `--resume`.
+
+## Lineage
+
+- Base: [NaGaa95/NetherSX2_nx](https://github.com/NaGaa95/NetherSX2_nx) (MIT),
+  remote `upstream`. Its history is kept so upstream releases can be merged.
+  It loads NetherSX2's Android `libemucore.so` (builds 4248 and 3668) in an
+  Android-like environment, with GL (NVC0/Zink) and Vulkan (NVK) renderers.
+- tico layer: [ticohq/tico-drasticDS](https://github.com/ticohq/tico-drasticDS),
+  the same so-loader lineage by the same author, already turned into a tico
+  module. Its `source/tico/` (entry, overlay, tico config, lang) is the model;
+  overlay files are GPL-2.0-or-later (Azahar / ticoverse.com).
+- Module format: <https://forum.ticoverse.com/topic/149/creating-tico-modules>.
+  In-game menu behaviour: <https://forum.ticoverse.com/topic/186/the-in-game-menu>.
+
+Read-only reference clones live in `_refs/` (git-ignored).
+
+## Module
+
+`tico/module/` is the module source; the build packs it as
+`tico-nethersx2-module.zip` holding `nethersx2/` (extracts into
+`sdmc:/tico/modules/`):
+
+```
+nethersx2/module.json
+nethersx2/tico-nethersx2.nro
+nethersx2/settings.json      settings screen, stored in tico/config/cores/nethersx2.jsonc
+nethersx2/lang/<lang>.json   strings for settings.json
+nethersx2/gamelists/ps2.dat.gz   Redump PS2 DAT
+```
+
+- System slug `ps2`, `naming: redump`, `disc_based`.
+- BIOS: `sdmc:/tico/system/nethersx2/`, any 4 MiB file (`any_of_size`).
+- Third-party modules get no TicoSecure session (the build secret is tico's
+  only): no playtime, no account, no RetroAchievements token from tico. Saves
+  and states still go to per-account folders through tico's paths.
+
+## Architecture (target)
+
+One NRO, `tico-nethersx2.nro`, built with `TICO=1`:
+
+1. **Entry** (`source/tico/tico_entry.c`): argv is `rom title`; `usb://`
+   tokens resolved; BIOS staged from tico's system folder; tico's jsonc
+   settings mapped onto the host's prefs; exit queues
+   `sdmc:/switch/tico/tico.nro --resume`. Started on its own: game list.
+2. **Unified renderer**: GL and Vulkan in one binary (Horizon Mesa SDK from
+   the `ghcr.io/autorunhq/switch-dev` image), chosen at run time from the
+   settings. Upstream picks one at compile time (`GS_RENDERER`, ~45 sites).
+3. **Core**: `libemucore.so` (4248 patched / 3668 classic) bundled in romfs at
+   build time from the user's NetherSX2 APKs; fallback to the standalone
+   NetherSX2_nx install's extracted copy.
+4. **Overlay**: tico's in-game menu (Plus + Minus) drawn with ImGui inside the
+   EGL/Vulkan present hooks; replaces upstream's OSD-text quick menu
+   (L + R + Plus). Save/load state with thumbnails, auto slot with
+   Continue Last Game, cheats, settings, per-game settings, reset/restart/exit.
+
+## Phases
+
+1. Repo, CI (switch-dev image), module skeleton, `TICO=1` build target.
+2. Entry + paths + `--resume`; settings.json mapped from the launcher's options.
+3. Runtime GL/VK selection in one NRO.
+4. ImGui overlay ported from tico-drasticDS.
+5. States with thumbnails, auto slot, per-game settings, cheats, game list.
+
+## Open questions
+
+- The user's NetherSX2 APKs (4248 and 3668) are needed to bundle the core and
+  to test; CI needs them from a private location.

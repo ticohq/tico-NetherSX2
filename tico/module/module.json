@@ -1,0 +1,35 @@
+{
+  "id": "nethersx2",
+  "name": "NetherSX2",
+  "nro": "tico-nethersx2.nro",
+  "launch": "\"{nro}\" \"{rom}\" \"{title}\"",
+  "settings": "settings.json",
+  "config_file": "nethersx2.jsonc",
+  "system_dir": "nethersx2",
+  "is_libretro": false,
+  "bool_true_value": "true",
+  "bool_false_value": "false",
+  "list_label": "NetherSX2 (PS2)",
+  "systems": [
+    {
+      "slug": "ps2",
+      "title": "PlayStation 2",
+      "short_title": "PS2",
+      // The disc images the core opens itself (quick_disc_extension_supported)
+      "extensions": [".iso", ".chd", ".cso", ".zso", ".gz", ".bin", ".mdf", ".img", ".nrg"],
+      "disc_based": true,
+      "naming": "redump",
+      "games_file": "ps2.dat",
+      // The core identifies a BIOS by its contents; every PS2 BIOS dump is 4 MiB
+      "bios": [
+        { "any_of_size": 4194304, "example": "scph39001.bin" }
+      ],
+      "colors": {
+        "start": "6F8FE6",
+        "end": "4F5FB8",
+        "start_dark": "4F66A8",
+        "end_dark": "384485"
+      }
+    }
+  ]
+}

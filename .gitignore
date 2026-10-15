@@ -12,3 +12,13 @@
 /out/
 /vulkan/
 Lossless.dll
+
+# tico module work
+/_refs/
+/SD_CARD/
+/build_tico/
+/NetherSX2-*/
+*.apk
+**/libemucore.so
+/tico-*-module.zip
+/source/tico/TicoSecret.h
