@@ -48,6 +48,18 @@ RESTART_PREFIXES = ("EmuCore/CPU/", "EmuCore/Gamefixes/", "SPU2/Output/")
 # are the menu's, not nethersx2.ini's.
 OWN_SECTIONS = {
     "system": [{
+        "id": "performance",
+        "title": "Performance",
+        "options": [{
+            # tico-dolphin's Boost mode (source/tico/tico_clocks.c)
+            "key": "Wrapper/BoostMode",
+            "label": "settings_nethersx2_boost_mode",
+            "text": "Boost mode (CPU 1785 MHz, GPU 768 MHz)",
+            "type": "bool",
+            "default": "false",
+            "restart": True,
+        }],
+    }, {
         "id": "interface",
         "title": "Interface",
         "options": [{
@@ -63,6 +75,50 @@ OWN_SECTIONS = {
             ],
         }],
     }],
+}
+
+# Other languages' strings for the module's own options and sections (the
+# launcher's options are English only); choice labels go through
+# settings_nethersx2_value_<label> keys, as tico_config.cpp looks them up.
+OWN_TRANSLATIONS = {
+    "settings_nethersx2_boost_mode": {
+        "pt": "Modo boost (CPU 1785 MHz, GPU 768 MHz)",
+        "es": "Modo boost (CPU 1785 MHz, GPU 768 MHz)",
+        "fr": "Mode boost (CPU 1785 MHz, GPU 768 MHz)",
+        "de": "Boost-Modus (CPU 1785 MHz, GPU 768 MHz)",
+        "ja": "ブーストモード（CPU 1785 MHz、GPU 768 MHz）",
+        "ru": "Режим ускорения (CPU 1785 МГц, GPU 768 МГц)",
+        "zh": "加速模式（CPU 1785 MHz，GPU 768 MHz）",
+    },
+    "settings_nethersx2_menu_theme": {
+        "pt": "Tema do menu do jogo",
+        "es": "Tema del menú del juego",
+        "fr": "Thème du menu en jeu",
+        "de": "Design des Spielmenüs",
+        "ja": "ゲーム内メニューのテーマ",
+        "ru": "Тема игрового меню",
+        "zh": "游戏内菜单主题",
+    },
+    "settings_nethersx2_section_performance": {
+        "pt": "Desempenho", "es": "Rendimiento", "fr": "Performances",
+        "de": "Leistung", "ja": "パフォーマンス", "ru": "Производительность", "zh": "性能",
+    },
+    "settings_nethersx2_section_interface": {
+        "pt": "Interface", "es": "Interfaz", "fr": "Interface",
+        "de": "Oberfläche", "ja": "インターフェース", "ru": "Интерфейс", "zh": "界面",
+    },
+    "settings_nethersx2_value_console_theme": {
+        "pt": "Tema do console", "es": "Tema de la consola", "fr": "Thème de la console",
+        "de": "Konsolendesign", "ja": "本体のテーマ", "ru": "Тема консоли", "zh": "主机主题",
+    },
+    "settings_nethersx2_value_light": {
+        "pt": "Claro", "es": "Claro", "fr": "Clair", "de": "Hell", "ja": "ライト",
+        "ru": "Светлая", "zh": "浅色",
+    },
+    "settings_nethersx2_value_dark": {
+        "pt": "Escuro", "es": "Oscuro", "fr": "Sombre", "de": "Dunkel", "ja": "ダーク",
+        "ru": "Тёмная", "zh": "深色",
+    },
 }
 
 STRING = r'"((?:[^"\\]|\\.)*)"'
@@ -209,6 +265,10 @@ def main():
             strings[section_key] = section["title"]
             for own in section["options"]:
                 strings[own["label"]] = own.pop("text")
+                for choice in own.get("choices", []):
+                    value_key = "settings_nethersx2_value_" + re.sub(
+                        r"[^a-z0-9]+", "_", choice["label"].lower()).strip("_")
+                    strings[value_key] = choice["label"]
             tab["sections"].append({"title": section_key, "options": section["options"]})
         tabs.append(tab)
     settings = {
@@ -227,6 +287,13 @@ def main():
     with open(os.path.join(args.module, "lang", "en.json"), "w", encoding="utf-8", newline="\n") as f:
         json.dump(strings, f, indent=2, ensure_ascii=False)
         f.write("\n")
+    languages = sorted({lang for texts in OWN_TRANSLATIONS.values() for lang in texts})
+    for lang in languages:
+        own = {key: texts[lang] for key, texts in OWN_TRANSLATIONS.items() if lang in texts}
+        with open(os.path.join(args.module, "lang", f"{lang}.json"), "w", encoding="utf-8",
+                  newline="\n") as f:
+            json.dump(own, f, indent=2, ensure_ascii=False)
+            f.write("\n")
     count = sum(len(s["options"]) for t in tabs for s in t["sections"])
     print(f"{count} options in {len(tabs)} tabs")
 

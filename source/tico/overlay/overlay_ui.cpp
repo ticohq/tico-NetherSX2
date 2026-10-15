@@ -2673,8 +2673,12 @@ void SetPlayerCallbacks(PlayerCallbacks callbacks) {
     s_player_cb = std::move(callbacks);
 }
 
+// The slot pictures are textures, made only while the overlay draws: the
+// prompt may be shown from another thread, so they are read on its next frame.
+bool s_refresh_slots_on_render = false;
+
 void ShowResumePrompt() {
-    RefreshSlots();
+    s_refresh_slots_on_render = true;
     OpenScreen(MenuScreen::Resume);
 }
 
@@ -2830,6 +2834,10 @@ void FeedTouch(const TouchInput& touch) {
 }
 
 Action Render(int display_w, int display_h) {
+    if (s_refresh_slots_on_render) {
+        s_refresh_slots_on_render = false;
+        RefreshSlots();
+    }
     const float delta_time = ImGui::GetIO().DeltaTime;
     const ImVec2 display_size(static_cast<float>(display_w), static_cast<float>(display_h));
     ImDrawList* dl = ImGui::GetForegroundDrawList();

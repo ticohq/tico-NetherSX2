@@ -2175,6 +2175,18 @@
           ]
         },
         {
+          "title": "settings_nethersx2_section_performance",
+          "options": [
+            {
+              "key": "Wrapper/BoostMode",
+              "label": "settings_nethersx2_boost_mode",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            }
+          ]
+        },
+        {
           "title": "settings_nethersx2_section_interface",
           "options": [
             {

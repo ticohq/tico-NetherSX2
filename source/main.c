@@ -38,6 +38,7 @@
 #include "tico/tico_picture.h"
 #include "tico/tico_entry.h"
 #include "tico/tico_menu.h"
+#include "tico/tico_clocks.h"
 #endif
 #ifdef USE_VULKAN
 #include "hooks/vk.h"
@@ -1926,6 +1927,8 @@ int main(int argc, char **argv) {
   romfsInit();
   if (!tico_prepare(argc, argv))
     fatal_error("Start a PlayStation 2 game from tico.");
+  // Boost mode sets the clocks itself: the startup FastLoad would lower the GPU
+  if (tico_clocks_start()) cpu_boost(0);
 #else
   (void)argc;
   (void)argv;
@@ -2124,6 +2127,7 @@ int main(int argc, char **argv) {
 #ifdef NETHERSX2_TICO
       (void)quick_menu_hint_shown;
       tico_menu_tick();
+      tico_clocks_keep();
       if (tico_menu_take_exit_request()) g_quick_menu_exit_requested = 1;
 #else
       if (!quick_menu_hint_shown && frame_count >= 300) {
@@ -2155,6 +2159,7 @@ int main(int argc, char **argv) {
        wait++)
     svcSleepThread(10000000ULL);
   tico_overlay_stop();
+  tico_clocks_restore();
   // Exit Game and the game ending on its own go back to tico, Restart here
   const bool restart = tico_menu_take_restart_request();
   const bool queued = restart ? tico_queue_restart() : tico_queue_return();

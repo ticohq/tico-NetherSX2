@@ -1,0 +1,9 @@
+{
+  "settings_nethersx2_boost_mode": "Режим ускорения (CPU 1785 МГц, GPU 768 МГц)",
+  "settings_nethersx2_menu_theme": "Тема игрового меню",
+  "settings_nethersx2_section_performance": "Производительность",
+  "settings_nethersx2_section_interface": "Интерфейс",
+  "settings_nethersx2_value_console_theme": "Тема консоли",
+  "settings_nethersx2_value_light": "Светлая",
+  "settings_nethersx2_value_dark": "Тёмная"
+}
