@@ -96,9 +96,18 @@ upstream.
   written on Exit, Restart, HOME and closing; the core's own resume state is
   no longer written. `pauseVM`/`saveStateSlot`/`loadStateSlot` queue work on
   the core's VM thread.
-- Unknown until tested: whether the core keeps presenting while paused. The
-  menu checks the first time it opens; when frames stop it lets the game run
-  behind the menu and logs it (`menu: the core stops presenting...`).
+- The core's `pauseVM` stops its presents (test 2), which froze the menu.
+  The menu holds the game instead: while it is open the presenting thread
+  stays in the present, copies the frame as the menu's background and
+  presents the menu over it (GL: in eglSwapBuffers; Vulkan: own acquires,
+  needs TRANSFER_SRC on the swapchain), which stalls the core; audio plays
+  silence (`aaudio_set_muted`). Save/load requests run when it closes.
+- Overlay slot N is the core's slot N-1 (NetherSX2 counts from 0); the auto
+  slot is the core's slot 10.
+- Options with `restart` keep their launch values in the prefs while the game
+  runs: the core applied a renderer change live and recreated its device.
+- tico 0.8 seals its theme for third parties: the menu uses the module's
+  `nethersx2_menu_theme` (default: the console's theme via setsys).
 - Cheats: `sdmc:/tico/cheats/ps2/<game file name>.pnach` is copied to
   `<system>/cheats/<CRC>.pnach` with every cheat off at each start.
 - Without TicoSecure the menu reads tico's display/general settings from the
@@ -121,7 +130,7 @@ no crash. tico passes the account folders as
 `sdmc:/tico/saves/users/<uid>/ps2/` (same for states).
 The OpenGL renderers were not reported.
 
-## Hardware test 2 (pending): the in-game menu
+## Hardware test 2 (2026-10-15): the in-game menu
 
 Copy `SD_CARD/tico` over the previous one. With Silent Hill 3 on Vulkan:
 1. Plus + Minus opens the menu; the same closes it. Does the game pause?
@@ -134,3 +143,23 @@ Copy `SD_CARD/tico` over the previous one. With Silent Hill 3 on Vulkan:
 6. Press HOME in game, return, then close the game from HOME.
 7. Repeat 1-2 with Renderer: OpenGL (NVC0).
 Send back `tico.log`, and a photo of the menu if anything looks wrong.
+
+Result: the menu opened in the light theme (tico's is dark); the slot picture
+showed; resolution scale and FPS display applied at once; changing the
+renderer in game recreated the GS device and left the menu open but
+invisible (controls lost); Restart crashed once with Silent Hill 3 but worked
+with Shadow of the Colossus, where Continue Last Game was also offered (with
+Silent Hill 3 it came during the boot logos). The log showed the core stops
+presenting while paused.
+
+## Hardware test 3 (pending)
+
+1. Plus + Minus: the game freezes under the menu (no sound) and resumes on
+   close; the menu follows the console theme (Settings > System > Interface
+   overrides it).
+2. Save to slot 1, load it; old test states now show one slot higher.
+3. Renderer change in game: nothing changes until Restart.
+4. Restart a few times with Silent Hill 3; Exit; Continue Last Game.
+5. Repeat 1 with OpenGL (NVC0).
+Send back `tico.log` (it now keeps every launch) and any
+`/atmosphere/crash_reports` file from a crash.
