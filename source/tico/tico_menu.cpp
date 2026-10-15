@@ -9,6 +9,7 @@
 
 #include <array>
 #include <cstdint>
+#include <cstdlib>
 #include <cstdio>
 #include <cstring>
 #include <ctime>
@@ -27,6 +28,7 @@ extern "C" {
 #include "tico/tico_entry.h"
 #include "tico/tico_menu.h"
 #include "tico/tico_settings.h"
+#include "tico/tico_picture.h"
 #include "tico/overlay_hook.h"
 #include "aaudio.h"
 #ifdef USE_VULKAN
@@ -344,6 +346,23 @@ struct Menu {
         closedir(dir);
     }
 
+    // The auto slot's picture: <serial> (<CRC>).resume.picture
+    std::string PicturePath() {
+        std::string path = StatePath(kAutoCoreSlot);
+        const size_t dot = path.rfind(".p2s");
+        return dot == std::string::npos ? std::string() : path.substr(0, dot) + ".picture";
+    }
+
+    // Exit or Restart: the frozen frame becomes the auto slot's picture,
+    // written by the presenting thread as the menu lets go.
+    void RequestPicture() {
+        const std::string path = PicturePath();
+        if (path.empty() || !open)
+            return;
+        std::snprintf(tico_picture_path, sizeof(tico_picture_path), "%s", path.c_str());
+        __atomic_store_n(&tico_picture_requested, 1, __ATOMIC_RELEASE);
+    }
+
     bool SlotOccupied(int core_slot) {
         const std::string path = StatePath(core_slot);
         struct stat status;
@@ -366,18 +385,37 @@ struct Menu {
         std::strftime(when, sizeof(when), "%Y-%m-%d %H:%M", std::localtime(&status.st_mtime));
         preview.saved_at = when;
         std::vector<unsigned char> png;
-        if (!ReadZipEntry(path, "Screenshot.png", png))
+        if (ReadZipEntry(path, "Screenshot.png", png)) {
+            int width = 0, height = 0, channels = 0;
+            unsigned char* rgba = stbi_load_from_memory(
+                png.data(), static_cast<int>(png.size()), &width, &height, &channels, 4);
+            if (!rgba)
+                return preview;
+            picture = ImGuiOverlay::CreateTexture(rgba, width, height);
+            stbi_image_free(rgba);
+            preview.texture = picture;
+            // PS2 frames are shown at 4:3 whatever their stored size
+            preview.aspect = 4.0f / 3.0f;
             return preview;
-        int width = 0, height = 0, channels = 0;
-        unsigned char* rgba = stbi_load_from_memory(png.data(), static_cast<int>(png.size()),
-                                                    &width, &height, &channels, 4);
+        }
+        // The resume state is written as the game shuts down, with no
+        // picture: the frame the menu froze for Exit or Restart is kept
+        // beside it, used while it is from the same exit
+        if (CoreSlot(overlay_slot) != kAutoCoreSlot)
+            return preview;
+        const std::string picture_path = PicturePath();
+        struct stat picture_status;
+        if (stat(picture_path.c_str(), &picture_status) != 0 ||
+            picture_status.st_mtime + 300 < status.st_mtime)
+            return preview;
+        int width = 0, height = 0;
+        unsigned char* rgba = tico_picture_read(picture_path.c_str(), &width, &height);
         if (!rgba)
             return preview;
         picture = ImGuiOverlay::CreateTexture(rgba, width, height);
-        stbi_image_free(rgba);
+        std::free(rgba);
         preview.texture = picture;
-        // PS2 frames are shown at 4:3 whatever their stored size
-        preview.aspect = 4.0f / 3.0f;
+        preview.aspect = static_cast<float>(width) / static_cast<float>(height);
         return preview;
     }
 
@@ -579,6 +617,7 @@ struct Menu {
             return;
         case Action::Exit:
             exit_requested = true;
+            RequestPicture();
             Close();
             return;
         case Action::Reset:
@@ -589,6 +628,7 @@ struct Menu {
         case Action::Restart:
             restart_requested = true;
             exit_requested = true;
+            RequestPicture();
             Close();
             return;
         case Action::EditText:

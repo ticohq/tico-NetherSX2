@@ -137,8 +137,11 @@ int sched_get_priority_max_fake(int policy) {
   return 0;
 }
 
+// the last message the core gave before abort(), for the crash log
+char g_abort_message[512];
+
 void android_set_abort_message_fake(const char *msg) {
-  (void)msg;
+  snprintf(g_abort_message, sizeof(g_abort_message), "%s", msg ? msg : "");
 }
 
 size_t __ctype_get_mb_cur_max_fake(void) {

@@ -48,6 +48,9 @@ void tico_overlay_set_background(unsigned long long texture, float u0, float v0,
                                  float v1);
 unsigned long long tico_overlay_vk_add_texture(VkSampler sampler, VkImageView view);
 void tico_overlay_vk_remove_texture(unsigned long long texture);
+/* The game is closing: the hooks draw nothing from now on (they stay set:
+ * the core's thread may be inside one). */
+void tico_overlay_stop(void);
 /* Frees the overlay's objects on a device the core is destroying. */
 void tico_overlay_vk_device_lost(VkDevice device);
 

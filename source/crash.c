@@ -47,6 +47,107 @@ static volatile int g_crashing;
 extern void fastmem_fault_trampoline(void);
 extern void fastmem_fault_resume_marker(void);
 
+#ifdef NETHERSX2_TICO
+#include <stdarg.h>
+#include <stdio.h>
+#include "config.h"
+#include "so_util.h"
+
+// A crash used to end the process in silence (back to the HOME menu). It is
+// now written to DATA_ROOT/crash.log first: where it happened, as an offset
+// in this NRO (tico-nethersx2.elf) or in the core, and the frame chain. The
+// file is written through fs directly: the crashed thread may hold stdio's
+// locks.
+extern so_module emu_mod;
+extern char __start__[];
+
+static char g_crash_text[4096];
+static size_t g_crash_length;
+
+static void crash_append(const char *format, ...) {
+  if (g_crash_length >= sizeof(g_crash_text) - 1) return;
+  va_list args;
+  va_start(args, format);
+  const int written = vsnprintf(g_crash_text + g_crash_length,
+                                sizeof(g_crash_text) - g_crash_length, format, args);
+  va_end(args);
+  if (written > 0) g_crash_length += (size_t)written;
+  if (g_crash_length > sizeof(g_crash_text) - 1) g_crash_length = sizeof(g_crash_text) - 1;
+}
+
+static int crash_readable(uintptr_t address) {
+  MemoryInfo info;
+  u32 page;
+  return R_SUCCEEDED(svcQueryMemory(&info, &page, address)) &&
+         (info.perm & Perm_R) && info.type != MemType_Unmapped;
+}
+
+static void crash_where(const char *label, uintptr_t address) {
+  const uintptr_t code = (uintptr_t)emu_mod.load_virtbase;
+  const uintptr_t data = (uintptr_t)emu_mod.load_base;
+  const uintptr_t host = (uintptr_t)__start__;
+  if (code && address >= code && address - code < emu_mod.load_size)
+    crash_append("%s 0x%lx core+0x%lx\n", label, address, address - code);
+  else if (data && address >= data && address - data < emu_mod.load_size)
+    crash_append("%s 0x%lx core(data)+0x%lx\n", label, address, address - data);
+  else if (address >= host && address - host < 0x10000000)
+    crash_append("%s 0x%lx host+0x%lx\n", label, address, address - host);
+  else
+    crash_append("%s 0x%lx\n", label, address);
+}
+
+static void crash_write_file(void) {
+  FsFileSystem *fs = fsdevGetDeviceFileSystem("sdmc");
+  if (!fs) return;
+  static const char path[] = DATA_ROOT "/crash.log";
+  fsFsCreateFile(fs, path, 0, 0);
+  FsFile file;
+  if (R_FAILED(fsFsOpenFile(fs, path, FsOpenMode_Write | FsOpenMode_Append, &file))) return;
+  s64 size = 0;
+  fsFileGetSize(&file, &size);
+  fsFileWrite(&file, size, g_crash_text, g_crash_length, FsWriteOption_Flush);
+  fsFileClose(&file);
+}
+
+/* The core called abort(): logged like a crash, with its abort message. */
+void crash_log_abort(uintptr_t caller, uintptr_t frame, const char *message) {
+  u64 thread_id = 0;
+  svcGetThreadId(&thread_id, CUR_THREAD_HANDLE);
+  crash_append("---- abort: thread %lu: %s\n", thread_id,
+               message && message[0] ? message : "(no message)");
+  crash_where("caller", caller);
+  for (int depth = 0; depth < 24; depth++) {
+    if (!frame || (frame & 7) || !crash_readable(frame) || !crash_readable(frame + 8))
+      break;
+    const uintptr_t next = *(const uintptr_t *)frame;
+    crash_where("  at", *(const uintptr_t *)(frame + 8));
+    if (next <= frame) break;
+    frame = next;
+  }
+  crash_write_file();
+  g_crash_length = 0;
+}
+
+static void crash_write_log(const ThreadExceptionDump *ctx) {
+  u64 thread_id = 0;
+  svcGetThreadId(&thread_id, CUR_THREAD_HANDLE);
+  crash_append("---- crash: thread %lu, esr 0x%x, far 0x%lx, sp 0x%lx\n",
+               thread_id, ctx->esr, ctx->far.x, ctx->sp.x);
+  crash_where("pc", ctx->pc.x);
+  crash_where("lr", ctx->lr.x);
+  uintptr_t frame = ctx->fp.x;
+  for (int depth = 0; depth < 24; depth++) {
+    if (!frame || (frame & 7) || !crash_readable(frame) || !crash_readable(frame + 8))
+      break;
+    const uintptr_t next = *(const uintptr_t *)frame;
+    crash_where("  at", *(const uintptr_t *)(frame + 8));
+    if (next <= frame) break;
+    frame = next;
+  }
+  crash_write_file();
+}
+#endif
+
 static ExceptionSlot *exception_slot_from_dump(ThreadExceptionDump *dump) {
   const uintptr_t address = (uintptr_t)dump;
   const uintptr_t base = (uintptr_t)g_exc_slots;
@@ -168,6 +269,9 @@ real_crash:
 #if defined(USE_VULKAN) && defined(NETHERSX2_VK_DIAGNOSTIC)
   vk_diag_exception(ctx->pc.x, ctx->far.x, ctx->esr, ctx->sp.x,
                     ctx->fp.x, ctx->lr.x);
+#endif
+#ifdef NETHERSX2_TICO
+  crash_write_log(ctx);
 #endif
   (void)ctx;
   svcExitProcess();

@@ -199,6 +199,15 @@ static int sched_setaffinity_fake(int pid, size_t sz, const void *mask) {
 
 static void abort_fake(void) {
   extern void NX_NORETURN __libnx_exit(int rc);
+#ifdef NETHERSX2_TICO
+  // logged, then back to tico rather than to the HOME menu
+  extern char g_abort_message[];
+  extern void crash_log_abort(uintptr_t caller, uintptr_t frame, const char *message);
+  extern _Bool tico_queue_return(void);
+  crash_log_abort((uintptr_t)__builtin_return_address(0),
+                  (uintptr_t)__builtin_frame_address(0), g_abort_message);
+  tico_queue_return();
+#endif
   __libnx_exit(134);
 }
 

@@ -3,6 +3,7 @@
 
 #include "tico/overlay_hook.h"
 #include "tico/tico_entry.h"
+#include "tico/tico_picture.h"
 #include "tico/tico_vk_present.h"
 
 #define MAX_IMAGES 8
@@ -319,6 +320,76 @@ static int submit(VkQueue queue, uint32_t index, uint32_t wait_count, const VkSe
   return 0;
 }
 
+/* Exit or Restart: the frozen frame, read back, is the auto slot's picture. */
+static void write_frozen_picture(VkQueue queue) {
+  const VkDeviceSize size = (VkDeviceSize)s.info.extent.width * s.info.extent.height * 4;
+  const VkBufferCreateInfo buffer_info = {
+    .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+    .size = size,
+    .usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+    .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+  };
+  VkBuffer buffer = VK_NULL_HANDLE;
+  VkDeviceMemory memory = VK_NULL_HANDLE;
+  if (vkCreateBuffer(s.device, &buffer_info, NULL, &buffer) != VK_SUCCESS) return;
+  VkMemoryRequirements requirements;
+  vkGetBufferMemoryRequirements(s.device, buffer, &requirements);
+  VkPhysicalDeviceMemoryProperties properties;
+  vkGetPhysicalDeviceMemoryProperties(s.info.physical_device, &properties);
+  const VkMemoryPropertyFlags wanted =
+      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+  uint32_t type = UINT32_MAX;
+  for (uint32_t i = 0; i < properties.memoryTypeCount && type == UINT32_MAX; i++)
+    if ((requirements.memoryTypeBits & (1u << i)) &&
+        (properties.memoryTypes[i].propertyFlags & wanted) == wanted)
+      type = i;
+  const VkMemoryAllocateInfo allocate = {
+    .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+    .allocationSize = requirements.size,
+    .memoryTypeIndex = type,
+  };
+  void *mapped = NULL;
+  if (type != UINT32_MAX &&
+      vkAllocateMemory(s.device, &allocate, NULL, &memory) == VK_SUCCESS &&
+      vkBindBufferMemory(s.device, buffer, memory, 0) == VK_SUCCESS) {
+    /* any finished image's command buffer will do */
+    const uint32_t index = 0;
+    VkCommandBuffer command = begin_commands(index);
+    barrier(command, s.frozen, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_ACCESS_SHADER_READ_BIT,
+            VK_ACCESS_TRANSFER_READ_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+            VK_PIPELINE_STAGE_TRANSFER_BIT);
+    const VkBufferImageCopy copy = {
+      .imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1},
+      .imageExtent = {s.info.extent.width, s.info.extent.height, 1},
+    };
+    vkCmdCopyImageToBuffer(command, s.frozen, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, buffer, 1,
+                           &copy);
+    barrier(command, s.frozen, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_ACCESS_TRANSFER_READ_BIT,
+            VK_ACCESS_SHADER_READ_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
+    vkEndCommandBuffer(command);
+    const VkSubmitInfo submit_info = {
+      .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+      .commandBufferCount = 1,
+      .pCommandBuffers = &command,
+    };
+    if (vkQueueSubmit(queue, 1, &submit_info, s.fences[index]) == VK_SUCCESS &&
+        vkWaitForFences(s.device, 1, &s.fences[index], VK_TRUE, UINT64_C(2000000000)) ==
+            VK_SUCCESS &&
+        vkMapMemory(s.device, memory, 0, size, 0, &mapped) == VK_SUCCESS) {
+      const int bgra = s.info.format == VK_FORMAT_B8G8R8A8_UNORM ||
+                       s.info.format == VK_FORMAT_B8G8R8A8_SRGB;
+      tico_picture_write(mapped, (int)s.info.extent.width, (int)s.info.extent.height,
+                         (int)s.info.extent.width * 4, bgra, 0);
+      vkUnmapMemory(s.device, memory);
+    }
+  }
+  if (memory) vkFreeMemory(s.device, memory, NULL);
+  vkDestroyBuffer(s.device, buffer, NULL);
+}
+
 int tico_vk_overlay_present(VkQueue queue, const VkPresentInfoKHR *present,
                             const TicoVkSwapchainInfo *swapchain,
                             VkPresentInfoKHR *out) {
@@ -423,6 +494,8 @@ int tico_vk_overlay_hold(VkQueue queue, const VkPresentInfoKHR *present,
     }
   }
   vkQueueWaitIdle(queue);
+  if (__atomic_load_n(&tico_picture_requested, __ATOMIC_ACQUIRE))
+    write_frozen_picture(queue);
   tico_overlay_set_background(0, 0.0f, 0.0f, 1.0f, 1.0f);
   tico_overlay_vk_remove_texture(background);
   tico_log("overlay: held the core for %d frames\n", frames);

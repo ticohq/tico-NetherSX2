@@ -35,6 +35,7 @@
 #include "ra_http.h"
 #ifdef NETHERSX2_TICO
 #include "tico/overlay_hook.h"
+#include "tico/tico_picture.h"
 #include "tico/tico_entry.h"
 #include "tico/tico_menu.h"
 #endif
@@ -2147,10 +2148,13 @@ int main(int argc, char **argv) {
 #ifdef NETHERSX2_TICO
   // the core writes the auto slot (its resume state) as it stops, below
   tico_menu_close();
-  // the overlay draws no more: the renderer goes away from here on
-  tico_vk_overlay_hook = NULL;
-  tico_gl_overlay_hook = NULL;
-  tico_overlay_wants_frame = NULL;
+  // The overlay draws no more: the renderer goes away from here on. Its
+  // hooks stay set (the core's thread may be in one), it stops inside them,
+  // once the auto slot's picture is written (a few frames at most).
+  for (int wait = 0; wait < 100 && __atomic_load_n(&tico_picture_requested, __ATOMIC_ACQUIRE);
+       wait++)
+    svcSleepThread(10000000ULL);
+  tico_overlay_stop();
   // Exit Game and the game ending on its own go back to tico, Restart here
   const bool restart = tico_menu_take_restart_request();
   const bool queued = restart ? tico_queue_restart() : tico_queue_return();

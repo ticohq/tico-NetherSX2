@@ -17,6 +17,7 @@
 #include "../hooks.h"
 #ifdef NETHERSX2_TICO
 #include "../tico/overlay_hook.h"
+#include "../tico/tico_picture.h"
 #endif
 
 #ifndef EGL_OPENGL_ES3_BIT
@@ -354,6 +355,15 @@ static void tico_hold_in_swap(EGLDisplay dpy, EGLSurface surface, int width, int
   }
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   tico_gl_overlay_hook(width, height);
+  // Exit or Restart: the frame is the auto slot's picture
+  if (__atomic_load_n(&tico_picture_requested, __ATOMIC_ACQUIRE)) {
+    unsigned char *pixels = malloc((size_t)width * height * 4);
+    if (pixels) {
+      glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+      tico_picture_write(pixels, width, height, width * 4, 0, 1);
+      free(pixels);
+    }
+  }
   tico_overlay_set_background(0, 0.0f, 0.0f, 1.0f, 1.0f);
   glDeleteTextures(1, &frozen);
 }

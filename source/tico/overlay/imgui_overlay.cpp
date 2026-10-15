@@ -920,3 +920,11 @@ extern "C" void tico_overlay_vk_device_lost(VkDevice device) {
         SwitchFrontend::ImGuiOverlay::DestroyVulkanBackend();
     }
 }
+
+extern "C" void tico_overlay_stop(void) {
+    std::lock_guard<std::recursive_mutex> lock(SwitchFrontend::ImGuiOverlay::s_mutex);
+    SwitchFrontend::ImGuiOverlay::s_initialized = false;
+    SwitchFrontend::ImGuiOverlay::s_visible = false;
+    SwitchFrontend::ImGuiOverlay::s_background = 0;
+    __atomic_store_n(&tico_overlay_hold, 0, __ATOMIC_RELEASE);
+}
