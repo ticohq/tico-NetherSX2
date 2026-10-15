@@ -103,7 +103,13 @@ upstream.
   needs TRANSFER_SRC on the swapchain), which stalls the core; audio plays
   silence (`aaudio_set_muted`). Save/load requests run when it closes.
 - Overlay slot N is the core's slot N-1 (NetherSX2 counts from 0); the auto
-  slot is the core's slot 10.
+  slot is the core's resume state, slot -1 (`<serial> (<CRC>).resume.p2s`),
+  written by `stopVMThreadLoop(save_resume_state=1)` on Exit, Restart and
+  close. The core's save/load JNI calls queue a lambda on the VM thread
+  (run in place when the VM loop is not up) that checks the VM state; the
+  file name is built by the core's GetStateFilename (no slot offset).
+- Vulkan hold: the swapchain gets one extra image (the core may already hold
+  an acquired one) and the menu's acquire times out after 500 ms.
 - Options with `restart` keep their launch values in the prefs while the game
   runs: the core applied a renderer change live and recreated its device.
 - tico 0.8 seals its theme for third parties: the menu uses the module's
@@ -152,7 +158,7 @@ with Shadow of the Colossus, where Continue Last Game was also offered (with
 Silent Hill 3 it came during the boot logos). The log showed the core stops
 presenting while paused.
 
-## Hardware test 3 (pending)
+## Hardware test 3 (2026-10-15)
 
 1. Plus + Minus: the game freezes under the menu (no sound) and resumes on
    close; the menu follows the console theme (Settings > System > Interface
@@ -163,3 +169,19 @@ presenting while paused.
 5. Repeat 1 with OpenGL (NVC0).
 Send back `tico.log` (it now keeps every launch) and any
 `/atmosphere/crash_reports` file from a crash.
+
+Result: the menu follows the console theme; it holds and releases the game;
+launch-only options now ask for Restart; Continue was offered. Exit crashed
+at times and Restart sometimes; loading a state seemed to do nothing; the
+slot list looked wrong (old states shifted by the new numbering). The log
+showed the slot-10 auto save mostly not confirmed within 5 s, and one launch
+(Shadow of the Colossus, Vulkan) stopped at the Continue prompt: the hold's
+acquire waited forever.
+
+## Hardware test 4 (pending)
+
+1. Exit and Restart several times (both games, Vulkan and OpenGL).
+2. Save to slot 1, then load it from a later point; check the picture.
+3. Exit, start again: Continue loads where Exit left off.
+Send back `tico.log` (states and shutdown steps are logged) and any
+`/atmosphere/crash_reports` file.
