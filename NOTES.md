@@ -66,7 +66,30 @@ One NRO, `tico-nethersx2.nro`, built with `TICO=1`:
 4. ImGui overlay ported from tico-drasticDS.
 5. States with thumbnails, auto slot, per-game settings, cheats, game list.
 
-## Open questions
+## Build
 
-- The user's NetherSX2 APKs (4248 and 3668) are needed to bundle the core and
-  to test; CI needs them from a private location.
+`tools/build_tico.sh` in the switch-dev image (CI: `.github/workflows/build.yml`,
+artifacts `tico-nethersx2_sd` = SD layout, `tico-nethersx2_debug` = ELF + map).
+The cores and their data come from the upstream release NRO's RomFS
+(`tools/extract_nro_romfs.py`, `UPSTREAM_RELEASE`, default 1.3.0), so no APK
+is needed. `settings.json` and `lang/en.json` are generated from the upstream
+launcher's option tables: rerun `tools/gen_tico_settings.py` after merging
+upstream.
+
+## State
+
+- Phase 1 and the settings half of phase 2 build in CI (Vulkan only).
+- Not yet run on hardware.
+- SD layout: `/tico/modules/nethersx2/`; data in `/tico/system/nethersx2/`
+  (BIOS at its top level, `resources/`, `cheats/`, `nethersx2.ini`,
+  `tico.log`); memory cards and states in the account's folders from the
+  launch template; Lossless.dll in `/tico/system/lsfg/`.
+- Upstream's quick menu (L + R + Plus) still runs; its Exit goes back to tico.
+
+## Hardware test 1 (pending)
+
+Copy `SD_CARD/tico` to the card, a PS2 BIOS into `/tico/system/nethersx2/`,
+a game into `/tico/roms/ps2/`; restart tico; start the game with tico in
+full-memory mode (title override). Check: the game boots, Settings >
+Emulator shows NetherSX2's tabs, L + R + Plus > Exit returns to tico.
+Send back `/tico/system/nethersx2/tico.log` and any crash report.
