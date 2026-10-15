@@ -33,6 +33,9 @@
 #include "SwitchStorageBridge.h"
 #include "CheatManager.h"
 #include "ra_http.h"
+#ifdef NETHERSX2_TICO
+#include "tico/tico_entry.h"
+#endif
 #ifdef USE_VULKAN
 #include "hooks/vk.h"
 #endif
@@ -1869,7 +1872,7 @@ static void update_touch(void) {
   }
 }
 
-int main(void) {
+int main(int argc, char **argv) {
   extern int crash_in_progress(void);
 #if defined(USE_VULKAN) && defined(NETHERSX2_VK_DIAGNOSTIC)
   unlink(DATA_ROOT "/nethersx2-exception.log");
@@ -1882,6 +1885,14 @@ int main(void) {
 
   // settings store: load nethersx2.ini + seed OpenGL/folder defaults
   prefs_init(PREFS_PATH);
+#ifdef NETHERSX2_TICO
+  romfsInit();
+  if (!tico_prepare(argc, argv))
+    fatal_error("Start a PlayStation 2 game from tico.");
+#else
+  (void)argc;
+  (void)argv;
+#endif
 #if GS_RENDERER == GS_RENDERER_OGL
   // The unified Mesa SDK contains both the native NVC0 Gallium driver and Zink. Select Zink before
   // libemucore initializes EGL; leaving the override unset preserves Mesa's native default.
@@ -2073,10 +2084,15 @@ int main(void) {
     quick_menu_close();
   turbo_set_active(0);
 
+#ifdef NETHERSX2_TICO
+  // Exit Game and the game ending on its own both go back to tico
+  tico_queue_return();
+#else
   const int has_next_load = envHasNextLoad();
   const char *launcher_path = prefs_get_string("Wrapper/LauncherPath", "");
   if (g_quick_menu_exit_requested && has_next_load && launcher_path[0])
     envSetNextLoad(launcher_path, launcher_path);
+#endif
 
   // The boot-time stop filter must be disabled during shutdown.
   { extern volatile int g_allow_stop; g_allow_stop = 1; }
@@ -2104,6 +2120,9 @@ int main(void) {
   libc_memory_shutdown();
   so_unload(&emu_mod);
   prefs_save();
+#ifdef NETHERSX2_TICO
+  romfsExit();
+#endif
   const bool storage_socket = switchStorageSocketReady();
   switchStorageShutdown();
   if (g_net_ready && !storage_socket)

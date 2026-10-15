@@ -27,10 +27,17 @@
 // On-SD layout. Paths are plain absolute SD paths (no "sdmc:" prefix): the core's
 // PCSX2 FileSystem treats a colon as a scheme, and libnx resolves "/..." to the SD
 // root, keeping the core off its Java FileHelper (SAF) bridge.
+#ifdef NETHERSX2_TICO
+// The tico module's system folder (module.json system_dir). tico checks the
+// BIOS in this folder itself, so the BIOS sits at its top level.
+#define DATA_ROOT      "/tico/system/nethersx2"
+#define BIOS_DIR       DATA_ROOT
+#else
 #define DATA_ROOT      "/switch/nethersx2"
+#define BIOS_DIR       DATA_ROOT "/bios"
+#endif
 #define RESOURCES_DIR  DATA_ROOT "/resources"
 #define CHEATS_DIR     DATA_ROOT "/cheats"
-#define BIOS_DIR       DATA_ROOT "/bios"
 #define CACHE_DIR      DATA_ROOT "/cache"
 #define PREFS_NAME     "nethersx2.ini"
 #define PREFS_PATH     DATA_ROOT "/" PREFS_NAME

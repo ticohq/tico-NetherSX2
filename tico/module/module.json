@@ -2,7 +2,8 @@
   "id": "nethersx2",
   "name": "NetherSX2",
   "nro": "tico-nethersx2.nro",
-  "launch": "\"{nro}\" \"{rom}\" \"{title}\"",
+  // saves and states are the playing account's folders: memory cards and states
+  "launch": "\"{nro}\" \"{rom}\" \"{title}\" \"--saves={saves}\" \"--states={states}\"",
   "settings": "settings.json",
   "config_file": "nethersx2.jsonc",
   "system_dir": "nethersx2",

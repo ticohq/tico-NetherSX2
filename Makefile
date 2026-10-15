@@ -21,6 +21,20 @@ INCLUDES	:=	source source/switch \
 			launcher/dependencies/build/_deps/libsmb2-src/include \
 			launcher/dependencies/build/_deps/libusbhsfs-src/include
 
+# TICO=1 builds tico-nethersx2.nro, the module's NRO that the tico frontend
+# chainloads (source/tico). TICO_ROMFS is a staged romfs holding the cores
+# (cores/emucore_<build>.so) and their data (res/<build>/), taken from the
+# upstream release NRO by tools/build_tico.sh. Vulkan only for now.
+ifeq ($(TICO),1)
+TARGET		:=	tico-nethersx2
+APP_TITLE	:=	tico-nethersx2
+APP_AUTHOR	:=	naga, hazevauks
+APP_VERSION	:=	0.1.0
+BUILD		:=	build_tico
+SOURCES		+=	source/tico
+RENDERER	:=	VK
+endif
+
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
@@ -30,6 +44,9 @@ LTOFLAGS := -flto=auto -fuse-linker-plugin
 # __SWITCH__ for libnx; NETHERSX2 gates the port-specific shim branches.
 DEFINES	:=	-D__SWITCH__ -DNETHERSX2 -DCURL_STATICLIB \
 			-DNETHERSX2_VERSION='"$(APP_VERSION)"'
+ifeq ($(TICO),1)
+DEFINES	+=	-DNETHERSX2_TICO
+endif
 
 ifneq ($(strip $(NETHERSX2_VK_DIAGNOSTIC)),)
 DEFINES += -DNETHERSX2_VK_DIAGNOSTIC
@@ -42,6 +59,8 @@ endif
 #   make RENDERER=VK -> Vulkan (Mesa NVK, vendored flat under vulkan/)
 RENDERER ?= GL
 MESA_SDK_ROOT ?=
+# nothing references libelf; the switch-dev image does not ship it (ELF_LIB=)
+ELF_LIB ?= -lelf
 ifneq ($(strip $(MESA_SDK_ROOT)),)
 DEFINES += -DUSE_UNIFIED_MESA
 endif
@@ -83,7 +102,7 @@ ifneq ($(strip $(MESA_SDK_ROOT)),)
 LIBDIRS	:= $(MESA_SDK_ROOT) $(PORTLIBS) $(LIBNX)
 LIBS	:= -Wl,--start-group -lvulkan -lEGL -lGLESv2 -lglapi \
 		-lmesa_util_c11 -lblake3 -lmesa_util -lmesa_util_simd -lxmlconfig \
-		-Wl,--end-group $(STORAGE_LIBS) -lcurl -lelf -lexpat -lz -lzstd \
+		-Wl,--end-group $(STORAGE_LIBS) -lcurl $(ELF_LIB) -lexpat -lz -lzstd \
 		-lnx -lstdc++ -lm
 else
 # Mesa NVK: 23 vendored static archives (vulkan/lib) linked in one --start-group
@@ -110,7 +129,7 @@ ifneq ($(strip $(MESA_SDK_ROOT)),)
 LIBDIRS	:= $(MESA_SDK_ROOT) $(PORTLIBS) $(LIBNX)
 LIBS	:= -Wl,--start-group -lvulkan -lEGL -lGLESv2 -lglapi \
 		-lmesa_util_c11 -lblake3 -lmesa_util -lmesa_util_simd -lxmlconfig \
-		-Wl,--end-group $(STORAGE_LIBS) -lcurl -lelf -lexpat -lz -lzstd \
+		-Wl,--end-group $(STORAGE_LIBS) -lcurl $(ELF_LIB) -lexpat -lz -lzstd \
 		-lnx -lstdc++ -lm
 else
 # EGL/GLESv2/glapi/drm_nouveau: switch-mesa/nouveau GL.
@@ -170,6 +189,10 @@ endif
 
 ifeq ($(strip $(NO_NACP)),)
 	export NROFLAGS += --nacp=$(CURDIR)/$(TARGET).nacp
+endif
+
+ifneq ($(strip $(TICO_ROMFS)),)
+	export NROFLAGS += --romfsdir=$(TICO_ROMFS)
 endif
 
 ifneq ($(APP_TITLEID),)
