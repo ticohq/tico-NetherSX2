@@ -19,6 +19,21 @@ bool tico_prepare(int argc, char **argv);
 
 const char *tico_display_title(void);
 
+/* The game as tico named it (sdmc:/... or usb://...): names its per-game
+ * settings and its cheat file. */
+const char *tico_rom_path(void);
+
+/* The playing account (32 hex digits) when tico's saves folder names it
+ * (.../users/<id>/ps2/), else "". */
+const char *tico_account_id(void);
+
+/* True when this launch is a Restart: the game starts over instead of
+ * offering to continue from the auto save. */
+bool tico_was_restarted(void);
+
+/* Queues this NRO with the same game for when this process exits. */
+bool tico_queue_restart(void);
+
 /* Queues tico with --resume for when this process exits. */
 bool tico_queue_return(void);
 

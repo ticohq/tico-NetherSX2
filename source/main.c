@@ -34,7 +34,9 @@
 #include "CheatManager.h"
 #include "ra_http.h"
 #ifdef NETHERSX2_TICO
+#include "tico/overlay_hook.h"
 #include "tico/tico_entry.h"
+#include "tico/tico_menu.h"
 #endif
 #ifdef USE_VULKAN
 #include "hooks/vk.h"
@@ -213,6 +215,7 @@ static struct {
   void (*addKeyedOSDMessage)(void *env, void *cls, void *key, void *message, float duration);
   void (*saveStateSlot)(void *env, void *cls, int slot);
   void (*loadStateSlot)(void *env, void *cls, int slot);
+  void (*pauseVM)(void *env, void *cls, jbool paused);
   void (*toggleLimiterMode)(void *env, void *cls, int mode);
   void (*reloadPatches)(void *env, void *cls);
   void (*setPadValue)(void *env, void *cls, int controller, int bind, float value);
@@ -250,6 +253,7 @@ static void resolve_entry_points(void) {
   RESOLVE(addKeyedOSDMessage,          NLSYM("addKeyedOSDMessage"));
   RESOLVE(saveStateSlot,               NLSYM("saveStateSlot"));
   RESOLVE(loadStateSlot,               NLSYM("loadStateSlot"));
+  nl.pauseVM = (void *)so_try_find_addr_rx(&emu_mod, NLSYM("pauseVM"));
   RESOLVE(toggleLimiterMode,           NLSYM("toggleLimiterMode"));
   nl.reloadPatches = (void *)so_try_find_addr_rx(&emu_mod, NLSYM("reloadPatches"));
   // setPadValue drives the emulated DualShock2 DIRECTLY (this is what AetherSX2's
@@ -295,6 +299,11 @@ void wrapper_game_changed(const char *path, const char *serial,
   (void)title;
   __atomic_store_n(&g_game_crc, crc, __ATOMIC_RELEASE);
   __atomic_store_n(&g_game_crc_changed, 1, __ATOMIC_RELEASE);
+#ifdef NETHERSX2_TICO
+  tico_menu_game_changed(serial, crc);
+#else
+  (void)serial;
+#endif
 }
 
 static void *emu_thread_main(void *arg) {
@@ -1764,7 +1773,11 @@ static void update_gamepads(void) {
     padUpdate(&g_pads[player]);
   const u64 menu_down = padGetButtons(&g_pads[0]);
   const u64 menu_pressed = menu_down & ~g_pad_previous[0];
+#ifdef NETHERSX2_TICO
+  if (tico_menu_update(menu_down, menu_pressed)) {
+#else
   if (quick_menu_update(menu_down, menu_pressed)) {
+#endif
     turbo_set_active(0);
     g_turbo_blocked = 1;
     for (int player = 0; player < g_controller_count; player++)
@@ -1874,6 +1887,31 @@ static void update_touch(void) {
     }
   }
 }
+
+#ifdef NETHERSX2_TICO
+static void tico_core_pause(bool paused) {
+  if (nl.pauseVM) nl.pauseVM(fake_env, NATIVE_CLASS, paused ? 1 : 0);
+}
+static void tico_core_save_state(int slot) {
+  nl.saveStateSlot(fake_env, NATIVE_CLASS, slot);
+}
+static void tico_core_load_state(int slot) {
+  nl.loadStateSlot(fake_env, NATIVE_CLASS, slot);
+}
+static void tico_core_reset(void) { nl.resetVM(fake_env, NATIVE_CLASS); }
+static void tico_core_apply_settings(void) {
+  nl.applySettings(fake_env, NATIVE_CLASS);
+  pad_load_bindings();
+}
+static void tico_core_reload_patches(void) {
+  if (nl.reloadPatches) nl.reloadPatches(fake_env, NATIVE_CLASS);
+}
+static int tico_core_presented_frames(void) {
+  extern volatile int vk_present_count;
+  extern volatile int egl_swap_count;
+  return GS_RENDERER_ACTIVE == GS_RENDERER_VK ? vk_present_count : egl_swap_count;
+}
+#endif
 
 int main(int argc, char **argv) {
   extern int crash_in_progress(void);
@@ -2026,6 +2064,22 @@ int main(int argc, char **argv) {
   vk_diag_note("core VM sequence returned vm_running=%d", g_vm_running);
 #endif
   rumble_init();
+#ifdef NETHERSX2_TICO
+  {
+    const TicoMenuCore menu_core = {
+      .pause = tico_core_pause,
+      .save_state = tico_core_save_state,
+      .load_state = tico_core_load_state,
+      .reset = tico_core_reset,
+      .apply_settings = tico_core_apply_settings,
+      .reload_patches = tico_core_reload_patches,
+      .release_inputs = quick_menu_release_inputs,
+      .presented_frames = tico_core_presented_frames,
+    };
+    tico_menu_init(&menu_core, GS_RENDERER_ACTIVE == GS_RENDERER_VK);
+  }
+  AppletFocusState focus = appletGetFocusState();
+#endif
 
 #ifdef NETHERSX2_TICO
   extern volatile int vk_present_count;
@@ -2073,10 +2127,21 @@ int main(int argc, char **argv) {
         cpu_boost(0);
         boosting = 0;
       }
+#ifdef NETHERSX2_TICO
+      (void)quick_menu_hint_shown;
+      tico_menu_tick();
+      if (tico_menu_take_exit_request()) g_quick_menu_exit_requested = 1;
+      // HOME may be the last chance: the game can be closed from there
+      const AppletFocusState now_focus = appletGetFocusState();
+      if (now_focus != focus && now_focus != AppletFocusState_InFocus && g_vm_running)
+        tico_menu_auto_save();
+      focus = now_focus;
+#else
       if (!quick_menu_hint_shown && frame_count >= 300) {
         quick_menu_status("Quick menu: L + R + Plus");
         quick_menu_hint_shown = 1;
       }
+#endif
     }
 
     update_gamepads();
@@ -2092,8 +2157,15 @@ int main(int argc, char **argv) {
   turbo_set_active(0);
 
 #ifdef NETHERSX2_TICO
-  // Exit Game and the game ending on its own both go back to tico
-  tico_queue_return();
+  // Exit, Restart and closing the game keep its spot in the auto slot
+  if (g_vm_running) tico_menu_auto_save();
+  // the overlay draws no more: the renderer goes away from here on
+  tico_vk_overlay_hook = NULL;
+  tico_gl_overlay_hook = NULL;
+  tico_overlay_wants_frame = NULL;
+  // Exit Game and the game ending on its own go back to tico, Restart here
+  if (!(tico_menu_take_restart_request() && tico_queue_restart()))
+    tico_queue_return();
 #else
   const int has_next_load = envHasNextLoad();
   const char *launcher_path = prefs_get_string("Wrapper/LauncherPath", "");
@@ -2104,7 +2176,12 @@ int main(int argc, char **argv) {
   // The boot-time stop filter must be disabled during shutdown.
   { extern volatile int g_allow_stop; g_allow_stop = 1; }
   // Explicit Exit skips the slow resume-state save; system close still keeps it.
+#ifdef NETHERSX2_TICO
+  // the auto slot stands in for the core's own resume state
+  const jbool save_resume_state = 0;
+#else
   const jbool save_resume_state = g_quick_menu_exit_requested ? 0 : 1;
+#endif
   nl.stopVMThreadLoop(fake_env, NATIVE_CLASS, save_resume_state);
   pthread_join(emu_thread, NULL);
   nl.waitForSaveStateFlush(fake_env, NATIVE_CLASS);

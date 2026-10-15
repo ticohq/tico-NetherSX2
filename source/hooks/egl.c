@@ -15,6 +15,9 @@
 #include "../config.h"
 #include "../util.h"
 #include "../hooks.h"
+#ifdef NETHERSX2_TICO
+#include "../tico/overlay_hook.h"
+#endif
 
 #ifndef EGL_OPENGL_ES3_BIT
 #define EGL_OPENGL_ES3_BIT 0x00000040
@@ -327,6 +330,23 @@ EGLBoolean eglSwapBuffersHook(EGLDisplay dpy, EGLSurface surface) {
   ++egl_swap_count;
   if (fake_pbuffer_from_surface(surface))
     return EGL_TRUE;
+#ifdef NETHERSX2_TICO
+  // the tico overlay, drawn onto the window framebuffer before the swap
+  if (tico_gl_overlay_hook && tico_overlay_wants_frame && tico_overlay_wants_frame()) {
+    EGLint width = 0, height = 0;
+    eglQuerySurface(dpy, surface, EGL_WIDTH, &width);
+    eglQuerySurface(dpy, surface, EGL_HEIGHT, &height);
+    if (width <= 0 || height <= 0) {
+      width = screen_width;
+      height = screen_height;
+    }
+    GLint framebuffer = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    tico_gl_overlay_hook(width, height);
+    glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)framebuffer);
+  }
+#endif
 
   return eglSwapBuffers(dpy, surface);
 }

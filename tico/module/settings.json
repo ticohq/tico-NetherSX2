@@ -101,8 +101,7 @@
                   "label": "6x (4K ~2160p)",
                   "value": "6"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/AspectRatio",
@@ -126,8 +125,7 @@
                   "label": "Auto",
                   "value": "Auto 4:3/3:2"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/FMVAspectRatioSwitch",
@@ -147,8 +145,7 @@
                   "label": "16:9",
                   "value": "16:9"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/VsyncEnable",
@@ -168,15 +165,13 @@
                   "label": "Adaptive",
                   "value": "2"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/SkipDuplicateFrames",
               "label": "settings_nethersx2_emucore_gs_skipduplicateframes",
               "type": "bool",
-              "default": "false",
-              "restart": true
+              "default": "false"
             },
             {
               "key": "EmuCore/GS/DisableThreadedPresentation",
@@ -207,8 +202,7 @@
                   "label": "Bilinear no-sprite",
                   "value": "3"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/MaxAnisotropy",
@@ -236,36 +230,31 @@
                   "label": "16x",
                   "value": "16"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/OsdShowFPS",
               "label": "settings_nethersx2_emucore_gs_osdshowfps",
               "type": "bool",
-              "default": "false",
-              "restart": true
+              "default": "false"
             },
             {
               "key": "EmuCore/GS/OsdShowMessages",
               "label": "settings_nethersx2_emucore_gs_osdshowmessages",
               "type": "bool",
-              "default": "true",
-              "restart": true
+              "default": "true"
             },
             {
               "key": "EmuCore/EnableWideScreenPatches",
               "label": "settings_nethersx2_emucore_enablewidescreenpatches",
               "type": "bool",
-              "default": "false",
-              "restart": true
+              "default": "false"
             },
             {
               "key": "EmuCore/EnableNoInterlacingPatches",
               "label": "settings_nethersx2_emucore_enablenointerlacingpatches",
               "type": "bool",
-              "default": "false",
-              "restart": true
+              "default": "false"
             }
           ]
         },
@@ -302,8 +291,7 @@
                   "label": "Maximum",
                   "value": "5"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/deinterlace_mode",
@@ -351,8 +339,7 @@
                   "label": "Adaptive BFF",
                   "value": "9"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/dithering_ps2",
@@ -372,8 +359,7 @@
                   "label": "Unscaled",
                   "value": "2"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/UserHacks_TriFilter",
@@ -397,15 +383,13 @@
                   "label": "Trilinear (Forced)",
                   "value": "2"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/mipmap_hw",
               "label": "settings_nethersx2_emucore_gs_mipmap_hw",
               "type": "bool",
-              "default": "true",
-              "restart": true
+              "default": "true"
             },
             {
               "key": "EmuCore/GS/CRCHackLevel",
@@ -437,8 +421,7 @@
                   "label": "Aggressive",
                   "value": "4"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/texture_preloading",
@@ -458,22 +441,19 @@
                   "label": "Full",
                   "value": "2"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/paltex",
               "label": "settings_nethersx2_emucore_gs_paltex",
               "type": "bool",
-              "default": "false",
-              "restart": true
+              "default": "false"
             },
             {
               "key": "EmuCore/GS/pcrtc_antiblur",
               "label": "settings_nethersx2_emucore_gs_pcrtc_antiblur",
               "type": "bool",
-              "default": "true",
-              "restart": true
+              "default": "true"
             },
             {
               "key": "EmuCore/GS/TVShader",
@@ -505,8 +485,7 @@
                   "label": "Lottes CRT",
                   "value": "5"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/CASMode",
@@ -526,8 +505,7 @@
                   "label": "Sharpen + upscale",
                   "value": "2"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/CASSharpness",
@@ -619,15 +597,13 @@
                   "label": "100",
                   "value": "100"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/ShadeBoost",
               "label": "settings_nethersx2_emucore_gs_shadeboost",
               "type": "bool",
-              "default": "false",
-              "restart": true
+              "default": "false"
             },
             {
               "key": "EmuCore/GS/ShadeBoost_Brightness",
@@ -723,8 +699,7 @@
               "depends_on": {
                 "key": "EmuCore/GS/ShadeBoost",
                 "value": "true"
-              },
-              "restart": true
+              }
             },
             {
               "key": "EmuCore/GS/ShadeBoost_Contrast",
@@ -820,8 +795,7 @@
               "depends_on": {
                 "key": "EmuCore/GS/ShadeBoost",
                 "value": "true"
-              },
-              "restart": true
+              }
             },
             {
               "key": "EmuCore/GS/ShadeBoost_Saturation",
@@ -917,22 +891,19 @@
               "depends_on": {
                 "key": "EmuCore/GS/ShadeBoost",
                 "value": "true"
-              },
-              "restart": true
+              }
             },
             {
               "key": "EmuCore/GS/LoadTextureReplacements",
               "label": "settings_nethersx2_emucore_gs_loadtexturereplacements",
               "type": "bool",
-              "default": "false",
-              "restart": true
+              "default": "false"
             },
             {
               "key": "EmuCore/GS/SoftwareRendererFMV",
               "label": "settings_nethersx2_emucore_gs_softwarerendererfmv",
               "type": "bool",
-              "default": "false",
-              "restart": true
+              "default": "false"
             },
             {
               "key": "EmuCore/GS/HWDownloadMode",
@@ -956,8 +927,7 @@
                   "label": "Disabled",
                   "value": "3"
                 }
-              ],
-              "restart": true
+              ]
             }
           ]
         },
@@ -968,8 +938,7 @@
               "key": "Wrapper/LSFGEnabled",
               "label": "settings_nethersx2_wrapper_lsfgenabled",
               "type": "bool",
-              "default": "false",
-              "restart": true
+              "default": "false"
             },
             {
               "key": "Wrapper/LSFGFlowScale",
@@ -1103,8 +1072,7 @@
                   "label": "100",
                   "value": "100"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "SPU2/Mixing/Interpolation",
@@ -1132,8 +1100,7 @@
                   "label": "Catmull-Rom",
                   "value": "4"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "SPU2/Output/SynchMode",
@@ -1457,8 +1424,7 @@
                   "label": "300%",
                   "value": "3"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/Speedhacks/EECycleSkip",
@@ -1482,8 +1448,7 @@
                   "label": "Maximum",
                   "value": "3"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/FastBoot",
@@ -1503,22 +1468,19 @@
               "key": "EmuCore/Speedhacks/vu1Instant",
               "label": "settings_nethersx2_emucore_speedhacks_vu1instant",
               "type": "bool",
-              "default": "true",
-              "restart": true
+              "default": "true"
             },
             {
               "key": "EmuCore/Speedhacks/vuFlagHack",
               "label": "settings_nethersx2_emucore_speedhacks_vuflaghack",
               "type": "bool",
-              "default": "true",
-              "restart": true
+              "default": "true"
             },
             {
               "key": "EmuCore/GS/SyncToHostRefreshRate",
               "label": "settings_nethersx2_emucore_gs_synctohostrefreshrate",
               "type": "bool",
-              "default": "false",
-              "restart": true
+              "default": "false"
             },
             {
               "key": "EmuCore/EnablePatches",
@@ -1536,8 +1498,7 @@
               "key": "EmuCore/GS/FrameLimitEnable",
               "label": "settings_nethersx2_emucore_gs_framelimitenable",
               "type": "bool",
-              "default": "true",
-              "restart": true
+              "default": "true"
             },
             {
               "key": "Framerate/NominalScalar",
@@ -1669,8 +1630,7 @@
               "depends_on": {
                 "key": "EmuCore/GS/FrameLimitEnable",
                 "value": "true"
-              },
-              "restart": true
+              }
             },
             {
               "key": "Framerate/TurboScalar",
@@ -1802,8 +1762,7 @@
               "depends_on": {
                 "key": "EmuCore/GS/FrameLimitEnable",
                 "value": "true"
-              },
-              "restart": true
+              }
             },
             {
               "key": "Framerate/SlomoScalar",
@@ -1935,8 +1894,7 @@
               "depends_on": {
                 "key": "EmuCore/GS/FrameLimitEnable",
                 "value": "true"
-              },
-              "restart": true
+              }
             },
             {
               "key": "EmuCore/GS/FramerateNTSC",
@@ -2056,8 +2014,7 @@
                   "label": "120 Hz",
                   "value": "120"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "EmuCore/GS/FrameratePAL",
@@ -2189,8 +2146,7 @@
                   "label": "100 Hz",
                   "value": "100"
                 }
-              ],
-              "restart": true
+              ]
             }
           ]
         },
@@ -2247,8 +2203,7 @@
               "key": "Wrapper/Vibration",
               "label": "settings_nethersx2_wrapper_vibration",
               "type": "bool",
-              "default": "true",
-              "restart": true
+              "default": "true"
             },
             {
               "key": "Wrapper/Pad1/Cross",
@@ -2324,8 +2279,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/Circle",
@@ -2401,8 +2355,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/Square",
@@ -2478,8 +2431,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/Triangle",
@@ -2555,8 +2507,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/L1",
@@ -2632,8 +2583,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/R1",
@@ -2709,8 +2659,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/L2",
@@ -2786,8 +2735,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/R2",
@@ -2863,8 +2811,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/L3",
@@ -2940,8 +2887,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/R3",
@@ -3017,8 +2963,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/Select",
@@ -3094,8 +3039,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/Start",
@@ -3171,8 +3115,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/Up",
@@ -3248,8 +3191,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/Down",
@@ -3325,8 +3267,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/Left",
@@ -3402,8 +3343,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/Right",
@@ -3479,8 +3419,7 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/LeftStick",
@@ -3500,22 +3439,19 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/LeftStickInvertX",
               "label": "settings_nethersx2_wrapper_pad1_leftstickinvertx",
               "type": "bool",
-              "default": "false",
-              "restart": true
+              "default": "false"
             },
             {
               "key": "Wrapper/Pad1/LeftStickInvertY",
               "label": "settings_nethersx2_wrapper_pad1_leftstickinverty",
               "type": "bool",
-              "default": "false",
-              "restart": true
+              "default": "false"
             },
             {
               "key": "Wrapper/Pad1/RightStick",
@@ -3535,22 +3471,19 @@
                   "label": "None",
                   "value": "None"
                 }
-              ],
-              "restart": true
+              ]
             },
             {
               "key": "Wrapper/Pad1/RightStickInvertX",
               "label": "settings_nethersx2_wrapper_pad1_rightstickinvertx",
               "type": "bool",
-              "default": "false",
-              "restart": true
+              "default": "false"
             },
             {
               "key": "Wrapper/Pad1/RightStickInvertY",
               "label": "settings_nethersx2_wrapper_pad1_rightstickinverty",
               "type": "bool",
-              "default": "false",
-              "restart": true
+              "default": "false"
             },
             {
               "key": "Wrapper/Pad1/Deadzone",
@@ -3602,8 +3535,7 @@
                   "label": "50",
                   "value": "50"
                 }
-              ],
-              "restart": true
+              ]
             }
           ]
         }
@@ -3683,15 +3615,13 @@
               "key": "EmuCore/Speedhacks/WaitLoop",
               "label": "settings_nethersx2_emucore_speedhacks_waitloop",
               "type": "bool",
-              "default": "true",
-              "restart": true
+              "default": "true"
             },
             {
               "key": "EmuCore/Speedhacks/IntcStat",
               "label": "settings_nethersx2_emucore_speedhacks_intcstat",
               "type": "bool",
-              "default": "true",
-              "restart": true
+              "default": "true"
             },
             {
               "key": "EmuCore/CPU/Recompiler/PauseOnTLBMiss",

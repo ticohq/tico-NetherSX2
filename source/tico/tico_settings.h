@@ -16,6 +16,10 @@ extern "C" {
  * rom is the game as tico named it; NULL for none. */
 void tico_settings_apply(const char *rom);
 
+/* Derives what the upstream launcher derived from its settings (renderer
+ * driver, threaded presentation per core, LSFG); after any change. */
+void tico_settings_derive(void);
+
 #ifdef __cplusplus
 }
 #endif

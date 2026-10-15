@@ -41,6 +41,28 @@ done
 # the settings definition, which the host applies to its prefs
 mkdir -p "$WORK/romfs/module"
 cp -f "$MODULE_SRC/settings.json" "$WORK/romfs/module/"
+# the in-game menu's fonts, selection borders and sidebar icons
+cp -R "$APP/source/tico/fonts" "$WORK/romfs/"
+mkdir -p "$WORK/romfs/assets"
+cp -R "$APP/source/tico/assets/border" "$APP/source/tico/assets/icons" "$WORK/romfs/assets/"
+# One set of strings per language: the menu's (source/tico/lang) and the
+# settings screen's (tico/module/lang, English where a language has none).
+# The menu reads them from romfs; tico merges the module's into its own.
+mkdir -p "$WORK/lang"
+python3 - "$APP/source/tico/lang" "$MODULE_SRC/lang" "$WORK/lang" <<'PY'
+import json, os, sys
+menu_dir, module_dir, out_dir = sys.argv[1:]
+settings_en = json.load(open(os.path.join(module_dir, "en.json"), encoding="utf-8"))
+for name in sorted(os.listdir(menu_dir)):
+    strings = json.load(open(os.path.join(menu_dir, name), encoding="utf-8"))
+    strings.update(settings_en)
+    own = os.path.join(module_dir, name)
+    if name != "en.json" and os.path.exists(own):
+        strings.update(json.load(open(own, encoding="utf-8")))
+    with open(os.path.join(out_dir, name), "w", encoding="utf-8") as f:
+        json.dump(strings, f, indent=1, ensure_ascii=False)
+PY
+cp -R "$WORK/lang" "$WORK/romfs/"
 
 echo "==== storage dependencies ===="
 DEPS_BUILD="$APP/launcher/dependencies/build"
@@ -59,6 +81,7 @@ MODULE_ID=$(sed -n 's/.*"id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$MODUL
 MODULE_OUT="$WORK/module/$MODULE_ID"
 mkdir -p "$MODULE_OUT/gamelists" "$OUT"
 cp -r "$MODULE_SRC/." "$MODULE_OUT/"
+cp -f "$WORK/lang/"*.json "$MODULE_OUT/lang/"
 cp -f "$APP/tico-nethersx2.nro" "$MODULE_OUT/"
 curl -fsSL "https://raw.githubusercontent.com/libretro/libretro-database/$DAT_COMMIT/metadat/redump/Sony%20-%20PlayStation%202.dat" \
   | gzip -9 > "$MODULE_OUT/gamelists/ps2.dat.gz"

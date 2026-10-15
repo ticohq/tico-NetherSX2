@@ -17,8 +17,17 @@
 #define STANDALONE_ROOT "/switch/nethersx2"
 #define SAVES_ARGUMENT  "--saves="
 #define STATES_ARGUMENT "--states="
+/* Restart relaunches this NRO with this argument added, so the game starts
+ * over instead of offering to continue from the auto save. */
+#define RESTART_ARGUMENT "--tico-restart"
 
 static char display_title[256];
+static char rom_path[1024];
+static char account_id[33];
+static bool restarted;
+static char self_path[512];
+/* the launch arguments, quoted, for Restart */
+static char launch_arguments[2048];
 
 static bool is_file(const char *path) {
   struct stat st;
@@ -161,15 +170,47 @@ static void set_folder(const char *key, const char *tico_folder,
   prefs_set_string(key, folder);
 }
 
+/* tico's saves folder for an account ends in users/<32 hex digits>/<slug>/ */
+static void remember_account(const char *saves) {
+  const char *users = saves ? strstr(saves, "/users/") : NULL;
+  if (!users) return;
+  users += 7;
+  size_t length = 0;
+  while (length < 32 && ((users[length] >= '0' && users[length] <= '9') ||
+                         (users[length] >= 'a' && users[length] <= 'f') ||
+                         (users[length] >= 'A' && users[length] <= 'F')))
+    length++;
+  if (length == 32 && users[32] == '/') snprintf(account_id, sizeof(account_id), "%.32s", users);
+}
+
+static void remember_launch(int argc, char **argv) {
+  if (argc > 0 && argv[0] && argv[0][0])
+    snprintf(self_path, sizeof(self_path), "%s", argv[0]);
+  size_t used = 0;
+  for (int index = 0; index < argc && argv[index]; index++) {
+    if (!strcmp(argv[index], RESTART_ARGUMENT)) {
+      restarted = true;
+      continue;
+    }
+    const int written = snprintf(launch_arguments + used, sizeof(launch_arguments) - used,
+                                 "%s\"%s\"", used ? " " : "", argv[index]);
+    if (written < 0 || (size_t)written >= sizeof(launch_arguments) - used) break;
+    used += (size_t)written;
+  }
+}
+
 bool tico_prepare(int argc, char **argv) {
   make_path(DATA_ROOT);
   make_path(CACHE_DIR);
   make_path(CHEATS_DIR);
+  remember_launch(argc, argv);
 
   const char *rom = NULL, *title = NULL, *saves = NULL, *states = NULL;
   for (int index = 1; index < argc; index++) {
     const char *argument = argv[index];
-    if (!argument || !argument[0] || !strcmp(argument, "ticoSetup")) continue;
+    if (!argument || !argument[0] || !strcmp(argument, "ticoSetup") ||
+        !strcmp(argument, RESTART_ARGUMENT))
+      continue;
     if (!strncmp(argument, SAVES_ARGUMENT, sizeof(SAVES_ARGUMENT) - 1))
       saves = argument + sizeof(SAVES_ARGUMENT) - 1;
     else if (!strncmp(argument, STATES_ARGUMENT, sizeof(STATES_ARGUMENT) - 1))
@@ -182,6 +223,7 @@ bool tico_prepare(int argc, char **argv) {
   for (int index = 0; index < argc; index++)
     tico_log("argv[%d] %s\n", index, argv[index] ? argv[index] : "(null)");
 
+  remember_account(saves);
   /* Memory cards are the game's own saves: they follow the account */
   set_folder("Folders/MemoryCards", saves, "sdmc:/tico/saves/ps2");
   set_folder("Folders/Savestates", states, "sdmc:/tico/states/ps2");
@@ -206,6 +248,7 @@ bool tico_prepare(int argc, char **argv) {
     snprintf(display_title, sizeof(display_title), "NetherSX2");
     return false;
   }
+  snprintf(rom_path, sizeof(rom_path), "%s", rom);
   char path[1024];
   resolve_rom(rom, path, sizeof(path));
   prefs_set_bool("Wrapper/BootBIOS", false);
@@ -223,6 +266,19 @@ bool tico_prepare(int argc, char **argv) {
 }
 
 const char *tico_display_title(void) { return display_title; }
+
+const char *tico_rom_path(void) { return rom_path; }
+
+const char *tico_account_id(void) { return account_id; }
+
+bool tico_was_restarted(void) { return restarted; }
+
+bool tico_queue_restart(void) {
+  if (!envHasNextLoad() || !self_path[0] || !is_file(self_path)) return false;
+  static char arguments[sizeof(launch_arguments) + 32];
+  snprintf(arguments, sizeof(arguments), "%s \"" RESTART_ARGUMENT "\"", launch_arguments);
+  return R_SUCCEEDED(envSetNextLoad(self_path, arguments));
+}
 
 bool tico_queue_return(void) {
   if (!envHasNextLoad()) return false;

@@ -37,6 +37,9 @@
 #include "../config.h"
 #include "../prefs.h"
 #include "../lsfg/lsfg_bridge.h"
+#ifdef NETHERSX2_TICO
+#include "../tico/tico_vk_present.h"
+#endif
 
 volatile int vk_present_count = 0;
 
@@ -135,6 +138,7 @@ static uint32_t         lsfg_main_queue_family = VK_QUEUE_FAMILY_IGNORED;
 
 static VkSwapchainKHR tracked_swapchain;
 static VkExtent2D     tracked_swapchain_extent;
+static VkFormat       tracked_swapchain_format;
 static int            tracked_swapchain_lsfg_compatible;
 
 static LsfgNxRuntime *lsfg_runtime;
@@ -307,6 +311,9 @@ static VkResult find_lsfg_main_queue_family(
 }
 
 static void reset_tracked_swapchain(void) {
+#ifdef NETHERSX2_TICO
+  tico_vk_overlay_reset();
+#endif
   lsfg_destroy_runtime();
   tracked_swapchain = VK_NULL_HANDLE;
   memset(&tracked_swapchain_extent, 0, sizeof(tracked_swapchain_extent));
@@ -619,6 +626,10 @@ vkCreateSwapchainKHR_shim(VkDevice device,
 
   VkSwapchainCreateInfoKHR modified = *create_info;
   int compatible = 0;
+#ifdef NETHERSX2_TICO
+  // the tico overlay draws onto the presented image in a render pass
+  modified.imageUsage |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+#endif
   const int requested = lsfg_requested();
   const int want_lsfg = lsfg_device_capable;
   const char *dll_path = lsfg_dll_path();
@@ -661,11 +672,16 @@ vkCreateSwapchainKHR_shim(VkDevice device,
   if (requested && want_lsfg && have_dll && !compatible)
     return VK_ERROR_FORMAT_NOT_SUPPORTED;
 
+#ifdef NETHERSX2_TICO
+  VkResult result = create_fn(device, &modified, alloc, out);
+#else
   VkResult result = create_fn(device, compatible ? &modified : create_info, alloc, out);
+#endif
   if (result == VK_SUCCESS) {
     reset_tracked_swapchain();
     tracked_swapchain = *out;
     tracked_swapchain_extent = create_info->imageExtent;
+    tracked_swapchain_format = create_info->imageFormat;
     tracked_swapchain_lsfg_compatible = compatible;
     __atomic_store_n(&lsfg_runtime_available, compatible, __ATOMIC_RELEASE);
   }
@@ -779,6 +795,18 @@ static int lsfg_try_create(VkQueue queue) {
 static VkResult VKAPI_CALL
 vkQueuePresentKHR_shim(VkQueue q, const VkPresentInfoKHR *pi) {
   ++vk_present_count;
+#ifdef NETHERSX2_TICO
+  // the tico overlay, drawn onto the image before it is presented
+  VkPresentInfoKHR with_overlay;
+  uint32_t overlay_family = 0;
+  if (tracked_swapchain && find_queue_family(q, &overlay_family)) {
+    const TicoVkSwapchainInfo overlay_swapchain = {
+        tracked_instance, tracked_physical_device, tracked_device, tracked_swapchain,
+        tracked_swapchain_format, tracked_swapchain_extent, overlay_family};
+    if (tico_vk_overlay_present(q, pi, &overlay_swapchain, &with_overlay))
+      pi = &with_overlay;
+  }
+#endif
 #ifdef NETHERSX2_VK_DIAGNOSTIC
   if (vk_present_count <= 4)
     vk_diag_note("vkQueuePresentKHR enter call=%d waits=%u swaps=%u lsfg=%d",

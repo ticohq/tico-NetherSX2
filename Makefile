@@ -32,8 +32,9 @@ APP_TITLE	:=	tico-nethersx2
 APP_AUTHOR	:=	naga, hazevauks
 APP_VERSION	:=	0.1.0
 BUILD		:=	build_tico
-SOURCES		+=	source/tico
-INCLUDES	+=	third_party/tico
+SOURCES		+=	source/tico source/tico/overlay \
+			third_party/imgui third_party/imgui/backends
+INCLUDES	+=	third_party/tico third_party/imgui third_party/imgui/backends
 RENDERER	:=	VK
 endif
 
@@ -47,7 +48,7 @@ LTOFLAGS := -flto=auto -fuse-linker-plugin
 DEFINES	:=	-D__SWITCH__ -DNETHERSX2 -DCURL_STATICLIB \
 			-DNETHERSX2_VERSION='"$(APP_VERSION)"'
 ifeq ($(TICO),1)
-DEFINES	+=	-DNETHERSX2_TICO
+DEFINES	+=	-DNETHERSX2_TICO -DIMGUI_USER_CONFIG=\"imgui_user_config.h\"
 endif
 
 ifneq ($(strip $(NETHERSX2_VK_DIAGNOSTIC)),)
@@ -138,6 +139,11 @@ else
 LIBDIRS	:= $(PORTLIBS) $(LIBNX)
 LIBS	:= $(STORAGE_LIBS) -lcurl -lz -lEGL -lGLESv2 -lglapi -ldrm_nouveau -lnx -lm
 endif
+endif
+
+ifeq ($(TICO),1)
+# TicoSecure (source/tico/TicoSecure.h): the session tico seals for its cores
+LIBS	+= -lsodium
 endif
 
 #---------------------------------------------------------------------------------

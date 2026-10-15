@@ -33,9 +33,16 @@ LAYOUT = [
     ]),
 ]
 
-# Read only when a game starts: the host applies everything at boot, so every
-# option needs Restart except those the in-game menu changes live.
-LIVE = set()
+# Read only when a game starts (the rest the core applies at once): the
+# renderer and core, the CPU and VU setup, game fixes, audio output, network.
+RESTART_KEYS = {
+    "EmuCore/GS/Renderer", "EmuCore/GS/DisableThreadedPresentation",
+    "EmuCore/Speedhacks/vuThread", "EmuCore/EnableGameFixes", "EmuCore/EnablePatches",
+    "Wrapper/CoreBuild", "Wrapper/FastmemMode", "Wrapper/FastBoot",
+    "Wrapper/SystemLanguage", "Wrapper/ControllerCount", "Wrapper/Network",
+    "Wrapper/NetDNS", "Wrapper/LSFGFlowScale", "Wrapper/LSFGPerformance",
+}
+RESTART_PREFIXES = ("EmuCore/CPU/", "EmuCore/Gamefixes/", "SPU2/Output/")
 
 STRING = r'"((?:[^"\\]|\\.)*)"'
 
@@ -149,7 +156,7 @@ def option(macro, args, choices, strings, prefix):
             entry["default"] = min(values, key=lambda v: abs(float(v) - float(entry["default"]))) \
                 if all(re.fullmatch(r"-?[\d.]+", v) for v in values + [entry["default"]]) \
                 else values[0]
-    if key not in LIVE:
+    if key in RESTART_KEYS or key.startswith(RESTART_PREFIXES):
         entry["restart"] = True
     return entry
 
