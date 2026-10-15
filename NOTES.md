@@ -78,7 +78,8 @@ upstream.
 
 ## State
 
-- Phase 1 and the settings half of phase 2 build in CI (Vulkan only).
+- Phases 1 to 3 build in CI: one NRO, renderer from the settings (Vulkan,
+  OpenGL NVC0, OpenGL Zink).
 - Not yet run on hardware.
 - SD layout: `/tico/modules/nethersx2/`; data in `/tico/system/nethersx2/`
   (BIOS at its top level, `resources/`, `cheats/`, `nethersx2.ini`,
@@ -92,4 +93,6 @@ Copy `SD_CARD/tico` to the card, a PS2 BIOS into `/tico/system/nethersx2/`,
 a game into `/tico/roms/ps2/`; restart tico; start the game with tico in
 full-memory mode (title override). Check: the game boots, Settings >
 Emulator shows NetherSX2's tabs, L + R + Plus > Exit returns to tico.
+Then Settings > Emulator > Video > Renderer: OpenGL (NVC0), and again with
+OpenGL (Zink/NVK); each should boot.
 Send back `/tico/system/nethersx2/tico.log` and any crash report.
