@@ -30,7 +30,7 @@ ifeq ($(TICO),1)
 TARGET		:=	tico-nethersx2
 APP_TITLE	:=	tico-nethersx2
 APP_AUTHOR	:=	naga, hazevauks
-APP_VERSION	:=	1.0.0
+APP_VERSION	:=	3.0.0
 BUILD		:=	build_tico
 SOURCES		+=	source/tico source/tico/overlay \
 			third_party/imgui third_party/imgui/backends
