@@ -48,6 +48,8 @@ void tico_overlay_set_background(unsigned long long texture, float u0, float v0,
                                  float v1);
 unsigned long long tico_overlay_vk_add_texture(VkSampler sampler, VkImageView view);
 void tico_overlay_vk_remove_texture(unsigned long long texture);
+/* Frees the overlay's objects on a device the core is destroying. */
+void tico_overlay_vk_device_lost(VkDevice device);
 
 #ifdef __cplusplus
 }

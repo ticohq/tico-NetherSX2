@@ -394,8 +394,10 @@ int tico_vk_overlay_hold(VkQueue queue, const VkPresentInfoKHR *present,
     /* the acquire semaphore is free again once the last frame's work is done */
     vkWaitForFences(s.device, 1, &s.fences[index], VK_TRUE, UINT64_MAX);
     uint32_t next = 0;
-    const VkResult acquired = vkAcquireNextImageKHR(s.device, s.swapchain, UINT64_MAX,
-                                                    s.acquired, VK_NULL_HANDLE, &next);
+    // never wait for good: with no image free the menu stops holding
+    const VkResult acquired = vkAcquireNextImageKHR(s.device, s.swapchain,
+                                                    UINT64_C(500000000), s.acquired,
+                                                    VK_NULL_HANDLE, &next);
     if ((acquired != VK_SUCCESS && acquired != VK_SUBOPTIMAL_KHR) || next >= s.image_count) {
       tico_log("overlay: acquire while holding failed (%d)\n", (int)acquired);
       break;

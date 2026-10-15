@@ -911,3 +911,12 @@ extern "C" void tico_overlay_vk_remove_texture(unsigned long long texture) {
         ImGui_ImplVulkan_RemoveTexture(reinterpret_cast<VkDescriptorSet>(texture));
     }
 }
+
+// The core is destroying its Vulkan device: what the overlay made on it goes
+// first (it is made again if a new device draws).
+extern "C" void tico_overlay_vk_device_lost(VkDevice device) {
+    std::lock_guard<std::recursive_mutex> lock(SwitchFrontend::ImGuiOverlay::s_mutex);
+    if (device && SwitchFrontend::ImGuiOverlay::s_vk.device == device) {
+        SwitchFrontend::ImGuiOverlay::DestroyVulkanBackend();
+    }
+}

@@ -14,6 +14,7 @@
 #include <ctime>
 #include <mutex>
 #include <string>
+#include <dirent.h>
 #include <sys/stat.h>
 #include <vector>
 
@@ -45,11 +46,11 @@ namespace TicoConfig = SwitchFrontend::TicoConfig;
 namespace {
 
 // The overlay's slots 1..5 are the core's first five, 0..4 (NetherSX2 counts
-// its slots from 0); its auto slot is the core's slot 10, past the 0..9 the
-// core's own menus offer.
+// its slots from 0). Its auto slot is the core's resume state, slot -1
+// (<serial> (<CRC>).resume.p2s), which the core writes itself when the game
+// is stopped with save_resume_state set (main.c).
 constexpr int kOverlaySlots = OverlayUI::kAutoStateSlot;
-constexpr int kAutoCoreSlot = 10;
-constexpr u64 kAutoSaveTimeoutMs = 5000;
+constexpr int kAutoCoreSlot = -1;
 constexpr u64 kRepeatDelayMs = 400;
 constexpr u64 kRepeatRateMs = 80;
 // frames the game shows, once the core names it, before the auto save is
@@ -309,9 +310,38 @@ struct Menu {
         if (!GameKnown(&game_serial, &game_crc))
             return {};
         char name[160];
-        std::snprintf(name, sizeof(name), "/%s (%08X).%02d.p2s", game_serial.c_str(),
-                      static_cast<unsigned>(game_crc), core_slot);
+        if (core_slot < 0)
+            std::snprintf(name, sizeof(name), "/%s (%08X).resume.p2s", game_serial.c_str(),
+                          static_cast<unsigned>(game_crc));
+        else
+            std::snprintf(name, sizeof(name), "/%s (%08X).%02d.p2s", game_serial.c_str(),
+                          static_cast<unsigned>(game_crc), core_slot);
         return std::string(prefs_get_string("Folders/Savestates", "")) + name;
+    }
+
+    // The game's states as the core named them, for the log.
+    void LogStates() {
+        std::string game_serial;
+        uint32_t game_crc = 0;
+        GameKnown(&game_serial, &game_crc);
+        const std::string folder = prefs_get_string("Folders/Savestates", "");
+        tico_log("menu: game %s (%08X), states in %s\n", game_serial.c_str(),
+                 static_cast<unsigned>(game_crc), folder.c_str());
+        char prefix[96];
+        std::snprintf(prefix, sizeof(prefix), "%s (%08X).", game_serial.c_str(),
+                      static_cast<unsigned>(game_crc));
+        DIR* dir = opendir(folder.c_str());
+        if (!dir)
+            return;
+        while (dirent* entry = readdir(dir)) {
+            if (std::strncmp(entry->d_name, prefix, std::strlen(prefix)) != 0)
+                continue;
+            struct stat status {};
+            stat((folder + "/" + entry->d_name).c_str(), &status);
+            tico_log("menu:   %s (%lld bytes)\n", entry->d_name,
+                     static_cast<long long>(status.st_size));
+        }
+        closedir(dir);
     }
 
     bool SlotOccupied(int core_slot) {
@@ -357,6 +387,7 @@ struct Menu {
         const bool known = GameKnown();
         if (known && core.save_state)
             core.save_state(CoreSlot(overlay_slot));
+        tico_log("menu: save slot %d -> %s\n", overlay_slot, StatePath(CoreSlot(overlay_slot)).c_str());
         auto lock = Lock();
         OverlayUI::ShowToast(
             TrFormat(known ? "nethersx2_saving_state" : "nethersx2_save_failed", overlay_slot));
@@ -367,42 +398,14 @@ struct Menu {
         const bool present = SlotOccupied(core_slot);
         if (present && core.load_state)
             core.load_state(core_slot);
+        tico_log("menu: load slot %d <- %s (%s)\n", overlay_slot, StatePath(core_slot).c_str(),
+                 present ? "found" : "missing");
         auto lock = Lock();
         if (present && core_slot == kAutoCoreSlot)
             OverlayUI::ShowToast(Tr("emulator_auto_loaded"));
         else
             OverlayUI::ShowToast(
                 TrFormat(present ? "nethersx2_state_loaded" : "nethersx2_load_failed", overlay_slot));
-    }
-
-    void AutoSave() {
-        if (!GameKnown() || !core.save_state)
-            return;
-        // the core saves on its own thread, which must be running
-        Close();
-        const std::string path = StatePath(kAutoCoreSlot);
-        struct stat before {};
-        const bool existed = stat(path.c_str(), &before) == 0;
-        core.save_state(kAutoCoreSlot);
-        const u64 deadline = NowMs() + kAutoSaveTimeoutMs;
-        off_t last_size = -1;
-        while (NowMs() < deadline) {
-            svcSleepThread(50000000ULL);
-            struct stat after {};
-            if (stat(path.c_str(), &after) != 0 || after.st_size <= 0)
-                continue;
-            const bool newer = !existed || after.st_mtime != before.st_mtime ||
-                               after.st_size != before.st_size;
-            // written once its size holds still between two looks
-            if (newer && after.st_size == last_size) {
-                tico_log("menu: auto save written (%lld bytes)\n",
-                         static_cast<long long>(after.st_size));
-                return;
-            }
-            last_size = after.st_size;
-        }
-        tico_log("menu: auto save not confirmed within %llu ms\n",
-                 static_cast<unsigned long long>(kAutoSaveTimeoutMs));
     }
 
     // A game with an auto save offers to continue from it, as tico's General >
@@ -654,8 +657,10 @@ struct Menu {
     void Tick() {
         if (!GameKnown() || !core.presented_frames)
             return;
-        if (frames_at_game < 0)
+        if (frames_at_game < 0) {
             frames_at_game = core.presented_frames();
+            LogStates();
+        }
         if (!cheats_imported)
             ImportTicoCheats();
         if (!resume_offered && core.presented_frames() - frames_at_game >= kResumeOfferFrames)
@@ -749,9 +754,13 @@ bool tico_menu_take_restart_request(void) {
     return true;
 }
 
-void tico_menu_auto_save(void) {
+bool tico_menu_game_known(void) {
+    return s_menu && s_menu->GameKnown();
+}
+
+void tico_menu_close(void) {
     if (s_menu)
-        s_menu->AutoSave();
+        s_menu->Close();
 }
 
 } // extern "C"

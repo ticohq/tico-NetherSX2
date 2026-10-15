@@ -641,6 +641,10 @@ vkCreateSwapchainKHR_shim(VkDevice device,
         (surface_caps.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_SRC_BIT)) {
       modified.imageUsage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
       copyable = 1;
+      // one image more, for the menu to acquire while the core holds one
+      if (!surface_caps.maxImageCount ||
+          modified.minImageCount < surface_caps.maxImageCount)
+        modified.minImageCount++;
     }
   }
 #endif
@@ -731,6 +735,9 @@ vkDestroyDevice_shim(VkDevice device, const VkAllocationCallbacks *alloc) {
 #endif
   if (device == tracked_device) {
     reset_tracked_swapchain();
+#ifdef NETHERSX2_TICO
+    tico_overlay_vk_device_lost(device);
+#endif
     tracked_device = VK_NULL_HANDLE;
     tracked_physical_device = VK_NULL_HANDLE;
     tracked_queue_count = 0;

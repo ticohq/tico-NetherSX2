@@ -49,9 +49,11 @@ bool tico_menu_take_exit_request(void);
 /* True once after Restart (with the exit request). */
 bool tico_menu_take_restart_request(void);
 
-/* Saves the game into the auto slot and waits (a few seconds at most) for
- * the file; call before the game closes (Exit, Restart, HOME). */
-void tico_menu_auto_save(void);
+/* True once the core has named the running game. */
+bool tico_menu_game_known(void);
+
+/* Closes the menu, letting the game run again. */
+void tico_menu_close(void);
 
 #ifdef __cplusplus
 }

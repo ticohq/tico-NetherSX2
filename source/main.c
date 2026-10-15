@@ -2072,7 +2072,6 @@ int main(int argc, char **argv) {
     };
     tico_menu_init(&menu_core, GS_RENDERER_ACTIVE == GS_RENDERER_VK);
   }
-  AppletFocusState focus = appletGetFocusState();
 #endif
 
 #ifdef NETHERSX2_TICO
@@ -2125,11 +2124,6 @@ int main(int argc, char **argv) {
       (void)quick_menu_hint_shown;
       tico_menu_tick();
       if (tico_menu_take_exit_request()) g_quick_menu_exit_requested = 1;
-      // HOME may be the last chance: the game can be closed from there
-      const AppletFocusState now_focus = appletGetFocusState();
-      if (now_focus != focus && now_focus != AppletFocusState_InFocus && g_vm_running)
-        tico_menu_auto_save();
-      focus = now_focus;
 #else
       if (!quick_menu_hint_shown && frame_count >= 300) {
         quick_menu_status("Quick menu: L + R + Plus");
@@ -2151,8 +2145,8 @@ int main(int argc, char **argv) {
   turbo_set_active(0);
 
 #ifdef NETHERSX2_TICO
-  // Exit, Restart and closing the game keep its spot in the auto slot
-  if (g_vm_running) tico_menu_auto_save();
+  // the core writes the auto slot (its resume state) as it stops, below
+  tico_menu_close();
   // the overlay draws no more: the renderer goes away from here on
   tico_vk_overlay_hook = NULL;
   tico_gl_overlay_hook = NULL;
@@ -2174,14 +2168,19 @@ int main(int argc, char **argv) {
   { extern volatile int g_allow_stop; g_allow_stop = 1; }
   // Explicit Exit skips the slow resume-state save; system close still keeps it.
 #ifdef NETHERSX2_TICO
-  // the auto slot stands in for the core's own resume state
-  const jbool save_resume_state = 0;
+  // tico's auto slot is the core's resume state: Exit, Restart and closing
+  // the game all keep the spot where it was left
+  const jbool save_resume_state = g_vm_running && tico_menu_game_known();
+  tico_log("exit: stopping the core (resume state %d)\n", save_resume_state);
 #else
   const jbool save_resume_state = g_quick_menu_exit_requested ? 0 : 1;
 #endif
   nl.stopVMThreadLoop(fake_env, NATIVE_CLASS, save_resume_state);
   pthread_join(emu_thread, NULL);
   nl.waitForSaveStateFlush(fake_env, NATIVE_CLASS);
+#ifdef NETHERSX2_TICO
+  tico_log("exit: core stopped, states written\n");
+#endif
   // Mirror Android's achievements shutdown before JNI services disappear.
   core_shutdown_achievements();
   if (nl.JNI_OnUnload)
