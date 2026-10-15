@@ -201,9 +201,41 @@ now stay set and `tico_overlay_stop()` stops the overlay under its lock.
 Continue's picture: the resume state has none, so the frame the menu froze
 for Exit/Restart is written beside it (`<serial> (<CRC>).resume.picture`).
 
-## Hardware test 5 (pending)
+## Hardware test 5 (2026-10-15)
 
 1. Exit and Restart many times (both games, both renderers).
 2. After Exit, Continue shows a picture.
 3. On any drop to the HOME menu, send `/tico/system/nethersx2/crash.log`
    with `tico.log`.
+
+Result: no crash in any test. Continue still showed no picture: the prompt
+read the slot pictures on the input thread (OfferResume), where textures
+cannot be made; it now reads them on its first drawn frame.
+
+## Boost mode
+
+`Wrapper/BoostMode` (System > Performance, off, read at launch):
+`source/tico/tico_clocks.c`, a C port of tico-dolphin's Boost mode (CPU
+1785 MHz, GPU 768 MHz; clock manager override through hoc:clk / sysclkOC /
+sysclk when registered, else clkrst/pcv; re-applied after dock changes and
+sleep; a faster clock is left alone; restored on exit). With it on, the
+upstream startup FastLoad boost is cancelled (it lowers the GPU).
+
+## ZIP (analysis, 2026-10-15)
+
+The core opens ISO/BIN/MDF/NRG/IMG and the compressed CHD, CSO/ZSO and
+indexed GZ itself; it has no ZIP disc reader (its unzip code only reads the
+bundled cheat archives). Options:
+- Extract to a cache, as tico-drasticDS does for NDS (libarchive): a PS2 ISO
+  is 0.7-4.7 GB, so the first launch of a game would take minutes and the
+  SD card would hold the image twice.
+- Read a stored (uncompressed) ZIP entry in place through the file shims:
+  no cost, but such ZIPs are rare and save no space.
+- Recommended for users: CHD (random access, smaller than ZIP, native).
+Not implemented.
+
+## Hardware test 6 (pending)
+
+1. Exit a game, start it again: Continue shows the picture.
+2. System > Performance > Boost mode on, Restart: tico.log says
+   `clocks: ...`; check the clocks with a status overlay; Exit puts them back.
