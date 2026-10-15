@@ -59,6 +59,15 @@
 #ifndef GS_RENDERER
 #define GS_RENDERER GS_RENDERER_OGL
 #endif
+// The renderer this run uses. The tico build links both (Horizon Mesa SDK) and
+// picks one from the settings at launch (tico_entry.c); GS_RENDERER is then
+// only its default.
+#ifdef NETHERSX2_TICO
+extern int g_gs_renderer;
+#define GS_RENDERER_ACTIVE g_gs_renderer
+#else
+#define GS_RENDERER_ACTIVE GS_RENDERER
+#endif
 
 // actual render/surface size (picked at runtime from docked state; see main.c)
 extern int screen_width;

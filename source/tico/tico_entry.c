@@ -192,10 +192,14 @@ bool tico_prepare(int argc, char **argv) {
   prefs_remove("Wrapper/GameConfigPath");
   prefs_remove("Wrapper/GameCRCPath");
   tico_settings_apply(rom);
-  /* the renderer this NRO was built for */
-  char renderer[8];
-  snprintf(renderer, sizeof(renderer), "%d", GS_RENDERER);
-  prefs_set_string("EmuCore/GS/Renderer", renderer);
+  /* Vulkan (14) or OpenGL; 13 is OpenGL through Zink, which the core only
+   * knows as OpenGL (Wrapper/GLDriver picks the Mesa driver) */
+  g_gs_renderer = prefs_get_int("EmuCore/GS/Renderer", GS_RENDERER) == GS_RENDERER_VK
+                      ? GS_RENDERER_VK : GS_RENDERER_OGL;
+  prefs_set_int("EmuCore/GS/Renderer", g_gs_renderer);
+  if (g_gs_renderer != GS_RENDERER_VK) prefs_set_bool("Wrapper/LSFGEnabled", false);
+  tico_log("renderer %d (%s)\n", g_gs_renderer,
+           prefs_get_string("Wrapper/GLDriver", "nvc0"));
   select_core();
 
   if (!rom) {

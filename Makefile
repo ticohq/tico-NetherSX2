@@ -24,7 +24,8 @@ INCLUDES	:=	source source/switch \
 # TICO=1 builds tico-nethersx2.nro, the module's NRO that the tico frontend
 # chainloads (source/tico). TICO_ROMFS is a staged romfs holding the cores
 # (cores/emucore_<build>.so) and their data (res/<build>/), taken from the
-# upstream release NRO by tools/build_tico.sh. Vulkan only for now.
+# upstream release NRO by tools/build_tico.sh. It links both renderers (the
+# Horizon Mesa SDK) and picks one at launch from the settings.
 ifeq ($(TICO),1)
 TARGET		:=	tico-nethersx2
 APP_TITLE	:=	tico-nethersx2

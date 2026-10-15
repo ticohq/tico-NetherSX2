@@ -63,7 +63,11 @@ static void *NATIVE_CLASS = NULL; // jclass for the NativeLibrary static natives
 static void *FAKE_CONTEXT = NULL; // android.content.Context
 static void *FAKE_SURFACE = NULL; // android.view.Surface
 
-#if GS_RENDERER == GS_RENDERER_VK
+#ifdef NETHERSX2_TICO
+int g_gs_renderer = GS_RENDERER;
+#endif
+
+#if GS_RENDERER == GS_RENDERER_VK || defined(NETHERSX2_TICO)
 // NVK opens the GPU (nvInitialize/nvMap) internally during vkCreateInstance and
 // needs a larger NV transfer-memory arena than the GL path's libnx default.
 // libnx declares this weak; a strong definition here overrides it. Tune on
@@ -151,16 +155,15 @@ static void check_data(const char *core_so, const char *disc_path) {
     fatal_error("Could not find\n%s.\nPlace it in /switch/nethersx2/\n(extract from the APK lib/arm64-v8a/).", core_so);
   if (!dir_nonempty(RESOURCES_DIR))
     fatal_error("Missing %s.\nCopy the APK assets/ folder there\n(shaders, GameIndex.yaml, fonts).", RESOURCES_DIR);
-#if GS_RENDERER == GS_RENDERER_VK
-  // The Vulkan renderer loads GLSL from shaders/vulkan/ (compiled to SPIR-V at
-  // runtime). Check the dir, not a specific file, so a filename difference
-  // across core versions doesn't false-fail a valid setup.
-  if (!dir_nonempty(RESOURCES_DIR "/shaders/vulkan"))
-    fatal_error("Missing Vulkan shaders in\n%s/shaders/vulkan/.\nCopy the APK assets/shaders/.", RESOURCES_DIR);
-#else
-  if (!path_exists(RESOURCES_DIR "/shaders/opengl/tfx_fs.glsl"))
+  if (GS_RENDERER_ACTIVE == GS_RENDERER_VK) {
+    // The Vulkan renderer loads GLSL from shaders/vulkan/ (compiled to SPIR-V at
+    // runtime). Check the dir, not a specific file, so a filename difference
+    // across core versions doesn't false-fail a valid setup.
+    if (!dir_nonempty(RESOURCES_DIR "/shaders/vulkan"))
+      fatal_error("Missing Vulkan shaders in\n%s/shaders/vulkan/.\nCopy the APK assets/shaders/.", RESOURCES_DIR);
+  } else if (!path_exists(RESOURCES_DIR "/shaders/opengl/tfx_fs.glsl")) {
     fatal_error("Missing OpenGL shaders in\n%s/shaders/opengl/.\nCopy the APK assets/shaders/.", RESOURCES_DIR);
-#endif
+  }
   if (!dir_nonempty(BIOS_DIR))
     fatal_error("Missing %s.\nPlace your PS2 BIOS dump there.", BIOS_DIR);
   if (disc_path && *disc_path && !path_exists(disc_path))
@@ -406,7 +409,7 @@ static void run_startup_sequence(void) {
 
   // Force the selected renderer and boot disc, overriding any defaults the core
   // wrote during initialize.
-  prefs_set_int("EmuCore/GS/Renderer", GS_RENDERER);
+  prefs_set_int("EmuCore/GS/Renderer", GS_RENDERER_ACTIVE);
   prefs_set_string("EmuCore/DiscPath", g_disc_path);
   prefs_set_string("EmuCore/EnableFastBoot",
                    !g_bios_boot && prefs_get_bool("Wrapper/FastBoot", true) ? "1" : "0");
@@ -1893,14 +1896,13 @@ int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
 #endif
-#if GS_RENDERER == GS_RENDERER_OGL
   // The unified Mesa SDK contains both the native NVC0 Gallium driver and Zink. Select Zink before
   // libemucore initializes EGL; leaving the override unset preserves Mesa's native default.
-  if (!strcmp(prefs_get_string("Wrapper/GLDriver", "nvc0"), "zink"))
+  if (GS_RENDERER_ACTIVE == GS_RENDERER_OGL &&
+      !strcmp(prefs_get_string("Wrapper/GLDriver", "nvc0"), "zink"))
     setenv("MESA_LOADER_DRIVER_OVERRIDE", "zink", 1);
   else
     unsetenv("MESA_LOADER_DRIVER_OVERRIDE");
-#endif
   // The launcher and overlay both manage this fixed directory. Override stale
   // 1.2.1 configs which incorrectly pointed the core at resources/.
   prefs_set_string("Folders/Cheats", CHEATS_DIR);
@@ -2025,7 +2027,12 @@ int main(int argc, char **argv) {
 #endif
   rumble_init();
 
-#if GS_RENDERER == GS_RENDERER_VK
+#ifdef NETHERSX2_TICO
+  extern volatile int vk_present_count;
+  extern volatile int egl_swap_count;
+#define FRAME_COUNT \
+  (GS_RENDERER_ACTIVE == GS_RENDERER_VK ? vk_present_count : egl_swap_count)
+#elif GS_RENDERER == GS_RENDERER_VK
   extern volatile int vk_present_count;
 #define FRAME_COUNT vk_present_count
 #else
