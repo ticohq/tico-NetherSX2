@@ -1,0 +1,3974 @@
+{
+  "core_id": "nethersx2",
+  "display_name": "NetherSX2",
+  "config_file": "nethersx2.jsonc",
+  "slugs": [
+    "ps2"
+  ],
+  "bool_true_value": "true",
+  "bool_false_value": "false",
+  "tabs": [
+    {
+      "name": "settings_nethersx2_tab_video",
+      "sections": [
+        {
+          "title": "settings_nethersx2_section_graphics",
+          "options": [
+            {
+              "key": "EmuCore/GS/Renderer",
+              "label": "settings_nethersx2_emucore_gs_renderer",
+              "type": "enum",
+              "default": "14",
+              "choices": [
+                {
+                  "label": "Vulkan (NVK)",
+                  "value": "14"
+                },
+                {
+                  "label": "OpenGL (NVC0)",
+                  "value": "12"
+                },
+                {
+                  "label": "OpenGL (Zink/NVK)",
+                  "value": "13"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/upscale_multiplier",
+              "label": "settings_nethersx2_emucore_gs_upscale_multiplier",
+              "type": "enum",
+              "default": "1",
+              "choices": [
+                {
+                  "label": "0.25x",
+                  "value": "0.25"
+                },
+                {
+                  "label": "0.5x",
+                  "value": "0.5"
+                },
+                {
+                  "label": "0.75x",
+                  "value": "0.75"
+                },
+                {
+                  "label": "1x (native ~480p)",
+                  "value": "1"
+                },
+                {
+                  "label": "1.25x",
+                  "value": "1.25"
+                },
+                {
+                  "label": "1.5x",
+                  "value": "1.5"
+                },
+                {
+                  "label": "1.75x",
+                  "value": "1.75"
+                },
+                {
+                  "label": "2x (~720p)",
+                  "value": "2"
+                },
+                {
+                  "label": "2.25x",
+                  "value": "2.25"
+                },
+                {
+                  "label": "2.5x",
+                  "value": "2.5"
+                },
+                {
+                  "label": "2.75x",
+                  "value": "2.75"
+                },
+                {
+                  "label": "3x (~1080p)",
+                  "value": "3"
+                },
+                {
+                  "label": "4x (~1440p)",
+                  "value": "4"
+                },
+                {
+                  "label": "5x (~1800p)",
+                  "value": "5"
+                },
+                {
+                  "label": "6x (4K ~2160p)",
+                  "value": "6"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/AspectRatio",
+              "label": "settings_nethersx2_emucore_gs_aspectratio",
+              "type": "enum",
+              "default": "4:3",
+              "choices": [
+                {
+                  "label": "4:3",
+                  "value": "4:3"
+                },
+                {
+                  "label": "16:9",
+                  "value": "16:9"
+                },
+                {
+                  "label": "Stretch",
+                  "value": "Stretch"
+                },
+                {
+                  "label": "Auto",
+                  "value": "Auto 4:3/3:2"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/FMVAspectRatioSwitch",
+              "label": "settings_nethersx2_emucore_gs_fmvaspectratioswitch",
+              "type": "enum",
+              "default": "Off",
+              "choices": [
+                {
+                  "label": "Off",
+                  "value": "Off"
+                },
+                {
+                  "label": "4:3",
+                  "value": "4:3"
+                },
+                {
+                  "label": "16:9",
+                  "value": "16:9"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/VsyncEnable",
+              "label": "settings_nethersx2_emucore_gs_vsyncenable",
+              "type": "enum",
+              "default": "0",
+              "choices": [
+                {
+                  "label": "Off",
+                  "value": "0"
+                },
+                {
+                  "label": "On",
+                  "value": "1"
+                },
+                {
+                  "label": "Adaptive",
+                  "value": "2"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/SkipDuplicateFrames",
+              "label": "settings_nethersx2_emucore_gs_skipduplicateframes",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/DisableThreadedPresentation",
+              "label": "settings_nethersx2_emucore_gs_disablethreadedpresentation",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/filter",
+              "label": "settings_nethersx2_emucore_gs_filter",
+              "type": "enum",
+              "default": "2",
+              "choices": [
+                {
+                  "label": "Nearest",
+                  "value": "0"
+                },
+                {
+                  "label": "Bilinear (PS2)",
+                  "value": "2"
+                },
+                {
+                  "label": "Bilinear (Forced)",
+                  "value": "1"
+                },
+                {
+                  "label": "Bilinear no-sprite",
+                  "value": "3"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/MaxAnisotropy",
+              "label": "settings_nethersx2_emucore_gs_maxanisotropy",
+              "type": "enum",
+              "default": "0",
+              "choices": [
+                {
+                  "label": "Off",
+                  "value": "0"
+                },
+                {
+                  "label": "2x",
+                  "value": "2"
+                },
+                {
+                  "label": "4x",
+                  "value": "4"
+                },
+                {
+                  "label": "8x",
+                  "value": "8"
+                },
+                {
+                  "label": "16x",
+                  "value": "16"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/OsdShowFPS",
+              "label": "settings_nethersx2_emucore_gs_osdshowfps",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/OsdShowMessages",
+              "label": "settings_nethersx2_emucore_gs_osdshowmessages",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/EnableWideScreenPatches",
+              "label": "settings_nethersx2_emucore_enablewidescreenpatches",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/EnableNoInterlacingPatches",
+              "label": "settings_nethersx2_emucore_enablenointerlacingpatches",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            }
+          ]
+        },
+        {
+          "title": "settings_nethersx2_section_enhancements",
+          "options": [
+            {
+              "key": "EmuCore/GS/accurate_blending_unit",
+              "label": "settings_nethersx2_emucore_gs_accurate_blending_unit",
+              "type": "enum",
+              "default": "1",
+              "choices": [
+                {
+                  "label": "Minimum",
+                  "value": "0"
+                },
+                {
+                  "label": "Basic",
+                  "value": "1"
+                },
+                {
+                  "label": "Medium",
+                  "value": "2"
+                },
+                {
+                  "label": "High",
+                  "value": "3"
+                },
+                {
+                  "label": "Full",
+                  "value": "4"
+                },
+                {
+                  "label": "Maximum",
+                  "value": "5"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/deinterlace_mode",
+              "label": "settings_nethersx2_emucore_gs_deinterlace_mode",
+              "type": "enum",
+              "default": "0",
+              "choices": [
+                {
+                  "label": "Auto",
+                  "value": "0"
+                },
+                {
+                  "label": "None",
+                  "value": "1"
+                },
+                {
+                  "label": "Weave TFF",
+                  "value": "2"
+                },
+                {
+                  "label": "Weave BFF",
+                  "value": "3"
+                },
+                {
+                  "label": "Bob TFF",
+                  "value": "4"
+                },
+                {
+                  "label": "Bob BFF",
+                  "value": "5"
+                },
+                {
+                  "label": "Blend TFF",
+                  "value": "6"
+                },
+                {
+                  "label": "Blend BFF",
+                  "value": "7"
+                },
+                {
+                  "label": "Adaptive TFF",
+                  "value": "8"
+                },
+                {
+                  "label": "Adaptive BFF",
+                  "value": "9"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/dithering_ps2",
+              "label": "settings_nethersx2_emucore_gs_dithering_ps2",
+              "type": "enum",
+              "default": "1",
+              "choices": [
+                {
+                  "label": "Off",
+                  "value": "0"
+                },
+                {
+                  "label": "Scaled",
+                  "value": "1"
+                },
+                {
+                  "label": "Unscaled",
+                  "value": "2"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/UserHacks_TriFilter",
+              "label": "settings_nethersx2_emucore_gs_userhacks_trifilter",
+              "type": "enum",
+              "default": "-1",
+              "choices": [
+                {
+                  "label": "Automatic",
+                  "value": "-1"
+                },
+                {
+                  "label": "Off",
+                  "value": "0"
+                },
+                {
+                  "label": "Trilinear (PS2)",
+                  "value": "1"
+                },
+                {
+                  "label": "Trilinear (Forced)",
+                  "value": "2"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/mipmap_hw",
+              "label": "settings_nethersx2_emucore_gs_mipmap_hw",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/CRCHackLevel",
+              "label": "settings_nethersx2_emucore_gs_crchacklevel",
+              "type": "enum",
+              "default": "-1",
+              "choices": [
+                {
+                  "label": "Auto",
+                  "value": "-1"
+                },
+                {
+                  "label": "None",
+                  "value": "0"
+                },
+                {
+                  "label": "Minimum",
+                  "value": "1"
+                },
+                {
+                  "label": "Partial",
+                  "value": "2"
+                },
+                {
+                  "label": "Full",
+                  "value": "3"
+                },
+                {
+                  "label": "Aggressive",
+                  "value": "4"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/texture_preloading",
+              "label": "settings_nethersx2_emucore_gs_texture_preloading",
+              "type": "enum",
+              "default": "2",
+              "choices": [
+                {
+                  "label": "None",
+                  "value": "0"
+                },
+                {
+                  "label": "Partial",
+                  "value": "1"
+                },
+                {
+                  "label": "Full",
+                  "value": "2"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/paltex",
+              "label": "settings_nethersx2_emucore_gs_paltex",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/pcrtc_antiblur",
+              "label": "settings_nethersx2_emucore_gs_pcrtc_antiblur",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/TVShader",
+              "label": "settings_nethersx2_emucore_gs_tvshader",
+              "type": "enum",
+              "default": "0",
+              "choices": [
+                {
+                  "label": "None",
+                  "value": "0"
+                },
+                {
+                  "label": "Scanline",
+                  "value": "1"
+                },
+                {
+                  "label": "Diagonal",
+                  "value": "2"
+                },
+                {
+                  "label": "Triangular",
+                  "value": "3"
+                },
+                {
+                  "label": "Wave",
+                  "value": "4"
+                },
+                {
+                  "label": "Lottes CRT",
+                  "value": "5"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/CASMode",
+              "label": "settings_nethersx2_emucore_gs_casmode",
+              "type": "enum",
+              "default": "0",
+              "choices": [
+                {
+                  "label": "Off",
+                  "value": "0"
+                },
+                {
+                  "label": "Sharpen only",
+                  "value": "1"
+                },
+                {
+                  "label": "Sharpen + upscale",
+                  "value": "2"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/CASSharpness",
+              "label": "settings_nethersx2_emucore_gs_cassharpness",
+              "type": "enum",
+              "default": "50",
+              "choices": [
+                {
+                  "label": "0",
+                  "value": "0"
+                },
+                {
+                  "label": "5",
+                  "value": "5"
+                },
+                {
+                  "label": "10",
+                  "value": "10"
+                },
+                {
+                  "label": "15",
+                  "value": "15"
+                },
+                {
+                  "label": "20",
+                  "value": "20"
+                },
+                {
+                  "label": "25",
+                  "value": "25"
+                },
+                {
+                  "label": "30",
+                  "value": "30"
+                },
+                {
+                  "label": "35",
+                  "value": "35"
+                },
+                {
+                  "label": "40",
+                  "value": "40"
+                },
+                {
+                  "label": "45",
+                  "value": "45"
+                },
+                {
+                  "label": "50",
+                  "value": "50"
+                },
+                {
+                  "label": "55",
+                  "value": "55"
+                },
+                {
+                  "label": "60",
+                  "value": "60"
+                },
+                {
+                  "label": "65",
+                  "value": "65"
+                },
+                {
+                  "label": "70",
+                  "value": "70"
+                },
+                {
+                  "label": "75",
+                  "value": "75"
+                },
+                {
+                  "label": "80",
+                  "value": "80"
+                },
+                {
+                  "label": "85",
+                  "value": "85"
+                },
+                {
+                  "label": "90",
+                  "value": "90"
+                },
+                {
+                  "label": "95",
+                  "value": "95"
+                },
+                {
+                  "label": "100",
+                  "value": "100"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/ShadeBoost",
+              "label": "settings_nethersx2_emucore_gs_shadeboost",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/ShadeBoost_Brightness",
+              "label": "settings_nethersx2_emucore_gs_shadeboost_brightness",
+              "type": "enum",
+              "default": "50",
+              "choices": [
+                {
+                  "label": "0",
+                  "value": "0"
+                },
+                {
+                  "label": "5",
+                  "value": "5"
+                },
+                {
+                  "label": "10",
+                  "value": "10"
+                },
+                {
+                  "label": "15",
+                  "value": "15"
+                },
+                {
+                  "label": "20",
+                  "value": "20"
+                },
+                {
+                  "label": "25",
+                  "value": "25"
+                },
+                {
+                  "label": "30",
+                  "value": "30"
+                },
+                {
+                  "label": "35",
+                  "value": "35"
+                },
+                {
+                  "label": "40",
+                  "value": "40"
+                },
+                {
+                  "label": "45",
+                  "value": "45"
+                },
+                {
+                  "label": "50",
+                  "value": "50"
+                },
+                {
+                  "label": "55",
+                  "value": "55"
+                },
+                {
+                  "label": "60",
+                  "value": "60"
+                },
+                {
+                  "label": "65",
+                  "value": "65"
+                },
+                {
+                  "label": "70",
+                  "value": "70"
+                },
+                {
+                  "label": "75",
+                  "value": "75"
+                },
+                {
+                  "label": "80",
+                  "value": "80"
+                },
+                {
+                  "label": "85",
+                  "value": "85"
+                },
+                {
+                  "label": "90",
+                  "value": "90"
+                },
+                {
+                  "label": "95",
+                  "value": "95"
+                },
+                {
+                  "label": "100",
+                  "value": "100"
+                }
+              ],
+              "depends_on": {
+                "key": "EmuCore/GS/ShadeBoost",
+                "value": "true"
+              },
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/ShadeBoost_Contrast",
+              "label": "settings_nethersx2_emucore_gs_shadeboost_contrast",
+              "type": "enum",
+              "default": "50",
+              "choices": [
+                {
+                  "label": "0",
+                  "value": "0"
+                },
+                {
+                  "label": "5",
+                  "value": "5"
+                },
+                {
+                  "label": "10",
+                  "value": "10"
+                },
+                {
+                  "label": "15",
+                  "value": "15"
+                },
+                {
+                  "label": "20",
+                  "value": "20"
+                },
+                {
+                  "label": "25",
+                  "value": "25"
+                },
+                {
+                  "label": "30",
+                  "value": "30"
+                },
+                {
+                  "label": "35",
+                  "value": "35"
+                },
+                {
+                  "label": "40",
+                  "value": "40"
+                },
+                {
+                  "label": "45",
+                  "value": "45"
+                },
+                {
+                  "label": "50",
+                  "value": "50"
+                },
+                {
+                  "label": "55",
+                  "value": "55"
+                },
+                {
+                  "label": "60",
+                  "value": "60"
+                },
+                {
+                  "label": "65",
+                  "value": "65"
+                },
+                {
+                  "label": "70",
+                  "value": "70"
+                },
+                {
+                  "label": "75",
+                  "value": "75"
+                },
+                {
+                  "label": "80",
+                  "value": "80"
+                },
+                {
+                  "label": "85",
+                  "value": "85"
+                },
+                {
+                  "label": "90",
+                  "value": "90"
+                },
+                {
+                  "label": "95",
+                  "value": "95"
+                },
+                {
+                  "label": "100",
+                  "value": "100"
+                }
+              ],
+              "depends_on": {
+                "key": "EmuCore/GS/ShadeBoost",
+                "value": "true"
+              },
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/ShadeBoost_Saturation",
+              "label": "settings_nethersx2_emucore_gs_shadeboost_saturation",
+              "type": "enum",
+              "default": "50",
+              "choices": [
+                {
+                  "label": "0",
+                  "value": "0"
+                },
+                {
+                  "label": "5",
+                  "value": "5"
+                },
+                {
+                  "label": "10",
+                  "value": "10"
+                },
+                {
+                  "label": "15",
+                  "value": "15"
+                },
+                {
+                  "label": "20",
+                  "value": "20"
+                },
+                {
+                  "label": "25",
+                  "value": "25"
+                },
+                {
+                  "label": "30",
+                  "value": "30"
+                },
+                {
+                  "label": "35",
+                  "value": "35"
+                },
+                {
+                  "label": "40",
+                  "value": "40"
+                },
+                {
+                  "label": "45",
+                  "value": "45"
+                },
+                {
+                  "label": "50",
+                  "value": "50"
+                },
+                {
+                  "label": "55",
+                  "value": "55"
+                },
+                {
+                  "label": "60",
+                  "value": "60"
+                },
+                {
+                  "label": "65",
+                  "value": "65"
+                },
+                {
+                  "label": "70",
+                  "value": "70"
+                },
+                {
+                  "label": "75",
+                  "value": "75"
+                },
+                {
+                  "label": "80",
+                  "value": "80"
+                },
+                {
+                  "label": "85",
+                  "value": "85"
+                },
+                {
+                  "label": "90",
+                  "value": "90"
+                },
+                {
+                  "label": "95",
+                  "value": "95"
+                },
+                {
+                  "label": "100",
+                  "value": "100"
+                }
+              ],
+              "depends_on": {
+                "key": "EmuCore/GS/ShadeBoost",
+                "value": "true"
+              },
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/LoadTextureReplacements",
+              "label": "settings_nethersx2_emucore_gs_loadtexturereplacements",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/SoftwareRendererFMV",
+              "label": "settings_nethersx2_emucore_gs_softwarerendererfmv",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/HWDownloadMode",
+              "label": "settings_nethersx2_emucore_gs_hwdownloadmode",
+              "type": "enum",
+              "default": "0",
+              "choices": [
+                {
+                  "label": "Accurate",
+                  "value": "0"
+                },
+                {
+                  "label": "Disable readbacks",
+                  "value": "1"
+                },
+                {
+                  "label": "Unsynchronized",
+                  "value": "2"
+                },
+                {
+                  "label": "Disabled",
+                  "value": "3"
+                }
+              ],
+              "restart": true
+            }
+          ]
+        },
+        {
+          "title": "settings_nethersx2_section_framegen",
+          "options": [
+            {
+              "key": "Wrapper/LSFGEnabled",
+              "label": "settings_nethersx2_wrapper_lsfgenabled",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "Wrapper/LSFGFlowScale",
+              "label": "settings_nethersx2_wrapper_lsfgflowscale",
+              "type": "enum",
+              "default": "0.25",
+              "choices": [
+                {
+                  "label": "Quarter (recommended)",
+                  "value": "0.25"
+                },
+                {
+                  "label": "Half",
+                  "value": "0.5"
+                }
+              ],
+              "depends_on": {
+                "key": "Wrapper/LSFGEnabled",
+                "value": "true"
+              },
+              "restart": true
+            },
+            {
+              "key": "Wrapper/LSFGPerformance",
+              "label": "settings_nethersx2_wrapper_lsfgperformance",
+              "type": "bool",
+              "default": "true",
+              "depends_on": {
+                "key": "Wrapper/LSFGEnabled",
+                "value": "true"
+              },
+              "restart": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "settings_nethersx2_tab_audio",
+      "sections": [
+        {
+          "title": "settings_nethersx2_section_audio",
+          "options": [
+            {
+              "key": "SPU2/Mixing/FinalVolume",
+              "label": "settings_nethersx2_spu2_mixing_finalvolume",
+              "type": "enum",
+              "default": "100",
+              "choices": [
+                {
+                  "label": "0",
+                  "value": "0"
+                },
+                {
+                  "label": "5",
+                  "value": "5"
+                },
+                {
+                  "label": "10",
+                  "value": "10"
+                },
+                {
+                  "label": "15",
+                  "value": "15"
+                },
+                {
+                  "label": "20",
+                  "value": "20"
+                },
+                {
+                  "label": "25",
+                  "value": "25"
+                },
+                {
+                  "label": "30",
+                  "value": "30"
+                },
+                {
+                  "label": "35",
+                  "value": "35"
+                },
+                {
+                  "label": "40",
+                  "value": "40"
+                },
+                {
+                  "label": "45",
+                  "value": "45"
+                },
+                {
+                  "label": "50",
+                  "value": "50"
+                },
+                {
+                  "label": "55",
+                  "value": "55"
+                },
+                {
+                  "label": "60",
+                  "value": "60"
+                },
+                {
+                  "label": "65",
+                  "value": "65"
+                },
+                {
+                  "label": "70",
+                  "value": "70"
+                },
+                {
+                  "label": "75",
+                  "value": "75"
+                },
+                {
+                  "label": "80",
+                  "value": "80"
+                },
+                {
+                  "label": "85",
+                  "value": "85"
+                },
+                {
+                  "label": "90",
+                  "value": "90"
+                },
+                {
+                  "label": "95",
+                  "value": "95"
+                },
+                {
+                  "label": "100",
+                  "value": "100"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "SPU2/Mixing/Interpolation",
+              "label": "settings_nethersx2_spu2_mixing_interpolation",
+              "type": "enum",
+              "default": "4",
+              "choices": [
+                {
+                  "label": "Nearest",
+                  "value": "0"
+                },
+                {
+                  "label": "Linear",
+                  "value": "1"
+                },
+                {
+                  "label": "Cubic",
+                  "value": "2"
+                },
+                {
+                  "label": "Hermite",
+                  "value": "3"
+                },
+                {
+                  "label": "Catmull-Rom",
+                  "value": "4"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "SPU2/Output/SynchMode",
+              "label": "settings_nethersx2_spu2_output_synchmode",
+              "type": "enum",
+              "default": "0",
+              "choices": [
+                {
+                  "label": "TimeStretch",
+                  "value": "0"
+                },
+                {
+                  "label": "Async",
+                  "value": "1"
+                },
+                {
+                  "label": "None",
+                  "value": "2"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "SPU2/Output/Latency",
+              "label": "settings_nethersx2_spu2_output_latency",
+              "type": "enum",
+              "default": "55",
+              "choices": [
+                {
+                  "label": "15",
+                  "value": "15"
+                },
+                {
+                  "label": "25",
+                  "value": "25"
+                },
+                {
+                  "label": "35",
+                  "value": "35"
+                },
+                {
+                  "label": "45",
+                  "value": "45"
+                },
+                {
+                  "label": "55",
+                  "value": "55"
+                },
+                {
+                  "label": "65",
+                  "value": "65"
+                },
+                {
+                  "label": "75",
+                  "value": "75"
+                },
+                {
+                  "label": "85",
+                  "value": "85"
+                },
+                {
+                  "label": "95",
+                  "value": "95"
+                },
+                {
+                  "label": "105",
+                  "value": "105"
+                },
+                {
+                  "label": "115",
+                  "value": "115"
+                },
+                {
+                  "label": "125",
+                  "value": "125"
+                },
+                {
+                  "label": "135",
+                  "value": "135"
+                },
+                {
+                  "label": "145",
+                  "value": "145"
+                },
+                {
+                  "label": "155",
+                  "value": "155"
+                },
+                {
+                  "label": "165",
+                  "value": "165"
+                },
+                {
+                  "label": "175",
+                  "value": "175"
+                },
+                {
+                  "label": "185",
+                  "value": "185"
+                },
+                {
+                  "label": "195",
+                  "value": "195"
+                },
+                {
+                  "label": "200",
+                  "value": "200"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "SPU2/Output/OutputLatency",
+              "label": "settings_nethersx2_spu2_output_outputlatency",
+              "type": "enum",
+              "default": "100",
+              "choices": [
+                {
+                  "label": "20",
+                  "value": "20"
+                },
+                {
+                  "label": "30",
+                  "value": "30"
+                },
+                {
+                  "label": "40",
+                  "value": "40"
+                },
+                {
+                  "label": "50",
+                  "value": "50"
+                },
+                {
+                  "label": "60",
+                  "value": "60"
+                },
+                {
+                  "label": "70",
+                  "value": "70"
+                },
+                {
+                  "label": "80",
+                  "value": "80"
+                },
+                {
+                  "label": "90",
+                  "value": "90"
+                },
+                {
+                  "label": "100",
+                  "value": "100"
+                },
+                {
+                  "label": "110",
+                  "value": "110"
+                },
+                {
+                  "label": "120",
+                  "value": "120"
+                },
+                {
+                  "label": "130",
+                  "value": "130"
+                },
+                {
+                  "label": "140",
+                  "value": "140"
+                },
+                {
+                  "label": "150",
+                  "value": "150"
+                },
+                {
+                  "label": "160",
+                  "value": "160"
+                },
+                {
+                  "label": "170",
+                  "value": "170"
+                },
+                {
+                  "label": "180",
+                  "value": "180"
+                },
+                {
+                  "label": "190",
+                  "value": "190"
+                },
+                {
+                  "label": "200",
+                  "value": "200"
+                }
+              ],
+              "restart": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "settings_nethersx2_tab_system",
+      "sections": [
+        {
+          "title": "settings_nethersx2_section_emulation",
+          "options": [
+            {
+              "key": "Wrapper/CoreBuild",
+              "label": "settings_nethersx2_wrapper_corebuild",
+              "type": "enum",
+              "default": "4248",
+              "choices": [
+                {
+                  "label": "Patched (4248)",
+                  "value": "4248"
+                },
+                {
+                  "label": "Classic (3668)",
+                  "value": "3668"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/FastmemMode",
+              "label": "settings_nethersx2_wrapper_fastmemmode",
+              "type": "enum",
+              "default": "hybrid",
+              "choices": [
+                {
+                  "label": "Off",
+                  "value": "off"
+                },
+                {
+                  "label": "On",
+                  "value": "hybrid"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/SystemLanguage",
+              "label": "settings_nethersx2_wrapper_systemlanguage",
+              "type": "enum",
+              "default": "auto",
+              "choices": [
+                {
+                  "label": "Auto",
+                  "value": "auto"
+                },
+                {
+                  "label": "English",
+                  "value": "1"
+                },
+                {
+                  "label": "Japanese",
+                  "value": "0"
+                },
+                {
+                  "label": "French",
+                  "value": "2"
+                },
+                {
+                  "label": "Spanish",
+                  "value": "3"
+                },
+                {
+                  "label": "German",
+                  "value": "4"
+                },
+                {
+                  "label": "Italian",
+                  "value": "5"
+                },
+                {
+                  "label": "Dutch",
+                  "value": "6"
+                },
+                {
+                  "label": "Portuguese",
+                  "value": "7"
+                },
+                {
+                  "label": "Don't change",
+                  "value": "off"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Speedhacks/EECycleRate",
+              "label": "settings_nethersx2_emucore_speedhacks_eecyclerate",
+              "type": "enum",
+              "default": "0",
+              "choices": [
+                {
+                  "label": "50%",
+                  "value": "-3"
+                },
+                {
+                  "label": "60%",
+                  "value": "-2"
+                },
+                {
+                  "label": "75%",
+                  "value": "-1"
+                },
+                {
+                  "label": "100%",
+                  "value": "0"
+                },
+                {
+                  "label": "130%",
+                  "value": "1"
+                },
+                {
+                  "label": "180%",
+                  "value": "2"
+                },
+                {
+                  "label": "300%",
+                  "value": "3"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Speedhacks/EECycleSkip",
+              "label": "settings_nethersx2_emucore_speedhacks_eecycleskip",
+              "type": "enum",
+              "default": "0",
+              "choices": [
+                {
+                  "label": "Off",
+                  "value": "0"
+                },
+                {
+                  "label": "Mild",
+                  "value": "1"
+                },
+                {
+                  "label": "Moderate",
+                  "value": "2"
+                },
+                {
+                  "label": "Maximum",
+                  "value": "3"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/FastBoot",
+              "label": "settings_nethersx2_wrapper_fastboot",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Speedhacks/vuThread",
+              "label": "settings_nethersx2_emucore_speedhacks_vuthread",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Speedhacks/vu1Instant",
+              "label": "settings_nethersx2_emucore_speedhacks_vu1instant",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Speedhacks/vuFlagHack",
+              "label": "settings_nethersx2_emucore_speedhacks_vuflaghack",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/SyncToHostRefreshRate",
+              "label": "settings_nethersx2_emucore_gs_synctohostrefreshrate",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/EnablePatches",
+              "label": "settings_nethersx2_emucore_enablepatches",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            }
+          ]
+        },
+        {
+          "title": "settings_nethersx2_section_framerate",
+          "options": [
+            {
+              "key": "EmuCore/GS/FrameLimitEnable",
+              "label": "settings_nethersx2_emucore_gs_framelimitenable",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "Framerate/NominalScalar",
+              "label": "settings_nethersx2_framerate_nominalscalar",
+              "type": "enum",
+              "default": "1",
+              "choices": [
+                {
+                  "label": "10%",
+                  "value": "0.1"
+                },
+                {
+                  "label": "20%",
+                  "value": "0.2"
+                },
+                {
+                  "label": "30%",
+                  "value": "0.3"
+                },
+                {
+                  "label": "40%",
+                  "value": "0.4"
+                },
+                {
+                  "label": "50%",
+                  "value": "0.5"
+                },
+                {
+                  "label": "60%",
+                  "value": "0.6"
+                },
+                {
+                  "label": "70%",
+                  "value": "0.7"
+                },
+                {
+                  "label": "80%",
+                  "value": "0.8"
+                },
+                {
+                  "label": "90%",
+                  "value": "0.9"
+                },
+                {
+                  "label": "100%",
+                  "value": "1"
+                },
+                {
+                  "label": "110%",
+                  "value": "1.1"
+                },
+                {
+                  "label": "120%",
+                  "value": "1.2"
+                },
+                {
+                  "label": "130%",
+                  "value": "1.3"
+                },
+                {
+                  "label": "140%",
+                  "value": "1.4"
+                },
+                {
+                  "label": "150%",
+                  "value": "1.5"
+                },
+                {
+                  "label": "160%",
+                  "value": "1.6"
+                },
+                {
+                  "label": "170%",
+                  "value": "1.7"
+                },
+                {
+                  "label": "180%",
+                  "value": "1.8"
+                },
+                {
+                  "label": "190%",
+                  "value": "1.9"
+                },
+                {
+                  "label": "200%",
+                  "value": "2"
+                },
+                {
+                  "label": "210%",
+                  "value": "2.1"
+                },
+                {
+                  "label": "220%",
+                  "value": "2.2"
+                },
+                {
+                  "label": "230%",
+                  "value": "2.3"
+                },
+                {
+                  "label": "240%",
+                  "value": "2.4"
+                },
+                {
+                  "label": "250%",
+                  "value": "2.5"
+                },
+                {
+                  "label": "260%",
+                  "value": "2.6"
+                },
+                {
+                  "label": "270%",
+                  "value": "2.7"
+                },
+                {
+                  "label": "280%",
+                  "value": "2.8"
+                },
+                {
+                  "label": "290%",
+                  "value": "2.9"
+                },
+                {
+                  "label": "300%",
+                  "value": "3"
+                }
+              ],
+              "depends_on": {
+                "key": "EmuCore/GS/FrameLimitEnable",
+                "value": "true"
+              },
+              "restart": true
+            },
+            {
+              "key": "Framerate/TurboScalar",
+              "label": "settings_nethersx2_framerate_turboscalar",
+              "type": "enum",
+              "default": "2",
+              "choices": [
+                {
+                  "label": "10%",
+                  "value": "0.1"
+                },
+                {
+                  "label": "20%",
+                  "value": "0.2"
+                },
+                {
+                  "label": "30%",
+                  "value": "0.3"
+                },
+                {
+                  "label": "40%",
+                  "value": "0.4"
+                },
+                {
+                  "label": "50%",
+                  "value": "0.5"
+                },
+                {
+                  "label": "60%",
+                  "value": "0.6"
+                },
+                {
+                  "label": "70%",
+                  "value": "0.7"
+                },
+                {
+                  "label": "80%",
+                  "value": "0.8"
+                },
+                {
+                  "label": "90%",
+                  "value": "0.9"
+                },
+                {
+                  "label": "100%",
+                  "value": "1"
+                },
+                {
+                  "label": "110%",
+                  "value": "1.1"
+                },
+                {
+                  "label": "120%",
+                  "value": "1.2"
+                },
+                {
+                  "label": "130%",
+                  "value": "1.3"
+                },
+                {
+                  "label": "140%",
+                  "value": "1.4"
+                },
+                {
+                  "label": "150%",
+                  "value": "1.5"
+                },
+                {
+                  "label": "160%",
+                  "value": "1.6"
+                },
+                {
+                  "label": "170%",
+                  "value": "1.7"
+                },
+                {
+                  "label": "180%",
+                  "value": "1.8"
+                },
+                {
+                  "label": "190%",
+                  "value": "1.9"
+                },
+                {
+                  "label": "200%",
+                  "value": "2"
+                },
+                {
+                  "label": "210%",
+                  "value": "2.1"
+                },
+                {
+                  "label": "220%",
+                  "value": "2.2"
+                },
+                {
+                  "label": "230%",
+                  "value": "2.3"
+                },
+                {
+                  "label": "240%",
+                  "value": "2.4"
+                },
+                {
+                  "label": "250%",
+                  "value": "2.5"
+                },
+                {
+                  "label": "260%",
+                  "value": "2.6"
+                },
+                {
+                  "label": "270%",
+                  "value": "2.7"
+                },
+                {
+                  "label": "280%",
+                  "value": "2.8"
+                },
+                {
+                  "label": "290%",
+                  "value": "2.9"
+                },
+                {
+                  "label": "300%",
+                  "value": "3"
+                }
+              ],
+              "depends_on": {
+                "key": "EmuCore/GS/FrameLimitEnable",
+                "value": "true"
+              },
+              "restart": true
+            },
+            {
+              "key": "Framerate/SlomoScalar",
+              "label": "settings_nethersx2_framerate_slomoscalar",
+              "type": "enum",
+              "default": "0.5",
+              "choices": [
+                {
+                  "label": "10%",
+                  "value": "0.1"
+                },
+                {
+                  "label": "20%",
+                  "value": "0.2"
+                },
+                {
+                  "label": "30%",
+                  "value": "0.3"
+                },
+                {
+                  "label": "40%",
+                  "value": "0.4"
+                },
+                {
+                  "label": "50%",
+                  "value": "0.5"
+                },
+                {
+                  "label": "60%",
+                  "value": "0.6"
+                },
+                {
+                  "label": "70%",
+                  "value": "0.7"
+                },
+                {
+                  "label": "80%",
+                  "value": "0.8"
+                },
+                {
+                  "label": "90%",
+                  "value": "0.9"
+                },
+                {
+                  "label": "100%",
+                  "value": "1"
+                },
+                {
+                  "label": "110%",
+                  "value": "1.1"
+                },
+                {
+                  "label": "120%",
+                  "value": "1.2"
+                },
+                {
+                  "label": "130%",
+                  "value": "1.3"
+                },
+                {
+                  "label": "140%",
+                  "value": "1.4"
+                },
+                {
+                  "label": "150%",
+                  "value": "1.5"
+                },
+                {
+                  "label": "160%",
+                  "value": "1.6"
+                },
+                {
+                  "label": "170%",
+                  "value": "1.7"
+                },
+                {
+                  "label": "180%",
+                  "value": "1.8"
+                },
+                {
+                  "label": "190%",
+                  "value": "1.9"
+                },
+                {
+                  "label": "200%",
+                  "value": "2"
+                },
+                {
+                  "label": "210%",
+                  "value": "2.1"
+                },
+                {
+                  "label": "220%",
+                  "value": "2.2"
+                },
+                {
+                  "label": "230%",
+                  "value": "2.3"
+                },
+                {
+                  "label": "240%",
+                  "value": "2.4"
+                },
+                {
+                  "label": "250%",
+                  "value": "2.5"
+                },
+                {
+                  "label": "260%",
+                  "value": "2.6"
+                },
+                {
+                  "label": "270%",
+                  "value": "2.7"
+                },
+                {
+                  "label": "280%",
+                  "value": "2.8"
+                },
+                {
+                  "label": "290%",
+                  "value": "2.9"
+                },
+                {
+                  "label": "300%",
+                  "value": "3"
+                }
+              ],
+              "depends_on": {
+                "key": "EmuCore/GS/FrameLimitEnable",
+                "value": "true"
+              },
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/FramerateNTSC",
+              "label": "settings_nethersx2_emucore_gs_frameratentsc",
+              "type": "enum",
+              "default": "59",
+              "choices": [
+                {
+                  "label": "15 Hz",
+                  "value": "15"
+                },
+                {
+                  "label": "19 Hz",
+                  "value": "19"
+                },
+                {
+                  "label": "23 Hz",
+                  "value": "23"
+                },
+                {
+                  "label": "27 Hz",
+                  "value": "27"
+                },
+                {
+                  "label": "31 Hz",
+                  "value": "31"
+                },
+                {
+                  "label": "35 Hz",
+                  "value": "35"
+                },
+                {
+                  "label": "39 Hz",
+                  "value": "39"
+                },
+                {
+                  "label": "43 Hz",
+                  "value": "43"
+                },
+                {
+                  "label": "47 Hz",
+                  "value": "47"
+                },
+                {
+                  "label": "51 Hz",
+                  "value": "51"
+                },
+                {
+                  "label": "55 Hz",
+                  "value": "55"
+                },
+                {
+                  "label": "59 Hz",
+                  "value": "59"
+                },
+                {
+                  "label": "63 Hz",
+                  "value": "63"
+                },
+                {
+                  "label": "67 Hz",
+                  "value": "67"
+                },
+                {
+                  "label": "71 Hz",
+                  "value": "71"
+                },
+                {
+                  "label": "75 Hz",
+                  "value": "75"
+                },
+                {
+                  "label": "79 Hz",
+                  "value": "79"
+                },
+                {
+                  "label": "83 Hz",
+                  "value": "83"
+                },
+                {
+                  "label": "87 Hz",
+                  "value": "87"
+                },
+                {
+                  "label": "91 Hz",
+                  "value": "91"
+                },
+                {
+                  "label": "95 Hz",
+                  "value": "95"
+                },
+                {
+                  "label": "99 Hz",
+                  "value": "99"
+                },
+                {
+                  "label": "103 Hz",
+                  "value": "103"
+                },
+                {
+                  "label": "107 Hz",
+                  "value": "107"
+                },
+                {
+                  "label": "111 Hz",
+                  "value": "111"
+                },
+                {
+                  "label": "115 Hz",
+                  "value": "115"
+                },
+                {
+                  "label": "119 Hz",
+                  "value": "119"
+                },
+                {
+                  "label": "120 Hz",
+                  "value": "120"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/GS/FrameratePAL",
+              "label": "settings_nethersx2_emucore_gs_frameratepal",
+              "type": "enum",
+              "default": "51",
+              "choices": [
+                {
+                  "label": "12 Hz",
+                  "value": "12"
+                },
+                {
+                  "label": "15 Hz",
+                  "value": "15"
+                },
+                {
+                  "label": "18 Hz",
+                  "value": "18"
+                },
+                {
+                  "label": "21 Hz",
+                  "value": "21"
+                },
+                {
+                  "label": "24 Hz",
+                  "value": "24"
+                },
+                {
+                  "label": "27 Hz",
+                  "value": "27"
+                },
+                {
+                  "label": "30 Hz",
+                  "value": "30"
+                },
+                {
+                  "label": "33 Hz",
+                  "value": "33"
+                },
+                {
+                  "label": "36 Hz",
+                  "value": "36"
+                },
+                {
+                  "label": "39 Hz",
+                  "value": "39"
+                },
+                {
+                  "label": "42 Hz",
+                  "value": "42"
+                },
+                {
+                  "label": "45 Hz",
+                  "value": "45"
+                },
+                {
+                  "label": "48 Hz",
+                  "value": "48"
+                },
+                {
+                  "label": "51 Hz",
+                  "value": "51"
+                },
+                {
+                  "label": "54 Hz",
+                  "value": "54"
+                },
+                {
+                  "label": "57 Hz",
+                  "value": "57"
+                },
+                {
+                  "label": "60 Hz",
+                  "value": "60"
+                },
+                {
+                  "label": "63 Hz",
+                  "value": "63"
+                },
+                {
+                  "label": "66 Hz",
+                  "value": "66"
+                },
+                {
+                  "label": "69 Hz",
+                  "value": "69"
+                },
+                {
+                  "label": "72 Hz",
+                  "value": "72"
+                },
+                {
+                  "label": "75 Hz",
+                  "value": "75"
+                },
+                {
+                  "label": "78 Hz",
+                  "value": "78"
+                },
+                {
+                  "label": "81 Hz",
+                  "value": "81"
+                },
+                {
+                  "label": "84 Hz",
+                  "value": "84"
+                },
+                {
+                  "label": "87 Hz",
+                  "value": "87"
+                },
+                {
+                  "label": "90 Hz",
+                  "value": "90"
+                },
+                {
+                  "label": "93 Hz",
+                  "value": "93"
+                },
+                {
+                  "label": "96 Hz",
+                  "value": "96"
+                },
+                {
+                  "label": "99 Hz",
+                  "value": "99"
+                },
+                {
+                  "label": "100 Hz",
+                  "value": "100"
+                }
+              ],
+              "restart": true
+            }
+          ]
+        },
+        {
+          "title": "settings_nethersx2_section_network",
+          "options": [
+            {
+              "key": "Wrapper/Network",
+              "label": "settings_nethersx2_wrapper_network",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "Wrapper/NetDNS",
+              "label": "settings_nethersx2_wrapper_netdns",
+              "type": "string",
+              "default": "",
+              "max_length": 64,
+              "depends_on": {
+                "key": "Wrapper/Network",
+                "value": "true"
+              },
+              "restart": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "settings_nethersx2_tab_controls",
+      "sections": [
+        {
+          "title": "settings_nethersx2_section_controller",
+          "options": [
+            {
+              "key": "Wrapper/ControllerCount",
+              "label": "settings_nethersx2_wrapper_controllercount",
+              "type": "enum",
+              "default": "2",
+              "choices": [
+                {
+                  "label": "1",
+                  "value": "1"
+                },
+                {
+                  "label": "2",
+                  "value": "2"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Vibration",
+              "label": "settings_nethersx2_wrapper_vibration",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/Cross",
+              "label": "settings_nethersx2_wrapper_pad1_cross",
+              "type": "enum",
+              "default": "B",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/Circle",
+              "label": "settings_nethersx2_wrapper_pad1_circle",
+              "type": "enum",
+              "default": "A",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/Square",
+              "label": "settings_nethersx2_wrapper_pad1_square",
+              "type": "enum",
+              "default": "Y",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/Triangle",
+              "label": "settings_nethersx2_wrapper_pad1_triangle",
+              "type": "enum",
+              "default": "X",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/L1",
+              "label": "settings_nethersx2_wrapper_pad1_l1",
+              "type": "enum",
+              "default": "L",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/R1",
+              "label": "settings_nethersx2_wrapper_pad1_r1",
+              "type": "enum",
+              "default": "R",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/L2",
+              "label": "settings_nethersx2_wrapper_pad1_l2",
+              "type": "enum",
+              "default": "ZL",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/R2",
+              "label": "settings_nethersx2_wrapper_pad1_r2",
+              "type": "enum",
+              "default": "ZR",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/L3",
+              "label": "settings_nethersx2_wrapper_pad1_l3",
+              "type": "enum",
+              "default": "StickL",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/R3",
+              "label": "settings_nethersx2_wrapper_pad1_r3",
+              "type": "enum",
+              "default": "StickR",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/Select",
+              "label": "settings_nethersx2_wrapper_pad1_select",
+              "type": "enum",
+              "default": "Minus",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/Start",
+              "label": "settings_nethersx2_wrapper_pad1_start",
+              "type": "enum",
+              "default": "Plus",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/Up",
+              "label": "settings_nethersx2_wrapper_pad1_up",
+              "type": "enum",
+              "default": "Up",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/Down",
+              "label": "settings_nethersx2_wrapper_pad1_down",
+              "type": "enum",
+              "default": "Down",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/Left",
+              "label": "settings_nethersx2_wrapper_pad1_left",
+              "type": "enum",
+              "default": "Left",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/Right",
+              "label": "settings_nethersx2_wrapper_pad1_right",
+              "type": "enum",
+              "default": "Right",
+              "choices": [
+                {
+                  "label": "A",
+                  "value": "A"
+                },
+                {
+                  "label": "B",
+                  "value": "B"
+                },
+                {
+                  "label": "X",
+                  "value": "X"
+                },
+                {
+                  "label": "Y",
+                  "value": "Y"
+                },
+                {
+                  "label": "L",
+                  "value": "L"
+                },
+                {
+                  "label": "R",
+                  "value": "R"
+                },
+                {
+                  "label": "ZL",
+                  "value": "ZL"
+                },
+                {
+                  "label": "ZR",
+                  "value": "ZR"
+                },
+                {
+                  "label": "Plus",
+                  "value": "Plus"
+                },
+                {
+                  "label": "Minus",
+                  "value": "Minus"
+                },
+                {
+                  "label": "L-Stick",
+                  "value": "StickL"
+                },
+                {
+                  "label": "R-Stick",
+                  "value": "StickR"
+                },
+                {
+                  "label": "D-Up",
+                  "value": "Up"
+                },
+                {
+                  "label": "D-Down",
+                  "value": "Down"
+                },
+                {
+                  "label": "D-Left",
+                  "value": "Left"
+                },
+                {
+                  "label": "D-Right",
+                  "value": "Right"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/LeftStick",
+              "label": "settings_nethersx2_wrapper_pad1_leftstick",
+              "type": "enum",
+              "default": "LStick",
+              "choices": [
+                {
+                  "label": "Left Stick",
+                  "value": "LStick"
+                },
+                {
+                  "label": "Right Stick",
+                  "value": "RStick"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/LeftStickInvertX",
+              "label": "settings_nethersx2_wrapper_pad1_leftstickinvertx",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/LeftStickInvertY",
+              "label": "settings_nethersx2_wrapper_pad1_leftstickinverty",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/RightStick",
+              "label": "settings_nethersx2_wrapper_pad1_rightstick",
+              "type": "enum",
+              "default": "RStick",
+              "choices": [
+                {
+                  "label": "Left Stick",
+                  "value": "LStick"
+                },
+                {
+                  "label": "Right Stick",
+                  "value": "RStick"
+                },
+                {
+                  "label": "None",
+                  "value": "None"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/RightStickInvertX",
+              "label": "settings_nethersx2_wrapper_pad1_rightstickinvertx",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/RightStickInvertY",
+              "label": "settings_nethersx2_wrapper_pad1_rightstickinverty",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "Wrapper/Pad1/Deadzone",
+              "label": "settings_nethersx2_wrapper_pad1_deadzone",
+              "type": "enum",
+              "default": "10",
+              "choices": [
+                {
+                  "label": "0",
+                  "value": "0"
+                },
+                {
+                  "label": "5",
+                  "value": "5"
+                },
+                {
+                  "label": "10",
+                  "value": "10"
+                },
+                {
+                  "label": "15",
+                  "value": "15"
+                },
+                {
+                  "label": "20",
+                  "value": "20"
+                },
+                {
+                  "label": "25",
+                  "value": "25"
+                },
+                {
+                  "label": "30",
+                  "value": "30"
+                },
+                {
+                  "label": "35",
+                  "value": "35"
+                },
+                {
+                  "label": "40",
+                  "value": "40"
+                },
+                {
+                  "label": "45",
+                  "value": "45"
+                },
+                {
+                  "label": "50",
+                  "value": "50"
+                }
+              ],
+              "restart": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "settings_nethersx2_tab_advanced",
+      "sections": [
+        {
+          "title": "settings_nethersx2_section_cpu",
+          "options": [
+            {
+              "key": "EmuCore/CPU/FPU.Roundmode",
+              "label": "settings_nethersx2_emucore_cpu_fpu_roundmode",
+              "type": "enum",
+              "default": "3",
+              "choices": [
+                {
+                  "label": "Nearest",
+                  "value": "0"
+                },
+                {
+                  "label": "Negative",
+                  "value": "1"
+                },
+                {
+                  "label": "Positive",
+                  "value": "2"
+                },
+                {
+                  "label": "Chop / Zero",
+                  "value": "3"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/CPU/Recompiler/FPUClampMode",
+              "label": "settings_nethersx2_emucore_cpu_recompiler_fpuclampmode",
+              "type": "enum",
+              "default": "1",
+              "choices": [
+                {
+                  "label": "None",
+                  "value": "0"
+                },
+                {
+                  "label": "Normal",
+                  "value": "1"
+                },
+                {
+                  "label": "Extra + Preserve Sign",
+                  "value": "2"
+                },
+                {
+                  "label": "Full",
+                  "value": "3"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/CPU/Recompiler/EnableEE",
+              "label": "settings_nethersx2_emucore_cpu_recompiler_enableee",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/CPU/Recompiler/EnableEECache",
+              "label": "settings_nethersx2_emucore_cpu_recompiler_enableeecache",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Speedhacks/WaitLoop",
+              "label": "settings_nethersx2_emucore_speedhacks_waitloop",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Speedhacks/IntcStat",
+              "label": "settings_nethersx2_emucore_speedhacks_intcstat",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/CPU/Recompiler/PauseOnTLBMiss",
+              "label": "settings_nethersx2_emucore_cpu_recompiler_pauseontlbmiss",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/CPU/VU0.Roundmode",
+              "label": "settings_nethersx2_emucore_cpu_vu0_roundmode",
+              "type": "enum",
+              "default": "3",
+              "choices": [
+                {
+                  "label": "Nearest",
+                  "value": "0"
+                },
+                {
+                  "label": "Negative",
+                  "value": "1"
+                },
+                {
+                  "label": "Positive",
+                  "value": "2"
+                },
+                {
+                  "label": "Chop / Zero",
+                  "value": "3"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/CPU/Recompiler/VU0ClampMode",
+              "label": "settings_nethersx2_emucore_cpu_recompiler_vu0clampmode",
+              "type": "enum",
+              "default": "1",
+              "choices": [
+                {
+                  "label": "None",
+                  "value": "0"
+                },
+                {
+                  "label": "Normal",
+                  "value": "1"
+                },
+                {
+                  "label": "Extra",
+                  "value": "2"
+                },
+                {
+                  "label": "Extra + Preserve Sign",
+                  "value": "3"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/CPU/Recompiler/EnableVU0",
+              "label": "settings_nethersx2_emucore_cpu_recompiler_enablevu0",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/CPU/VU1.Roundmode",
+              "label": "settings_nethersx2_emucore_cpu_vu1_roundmode",
+              "type": "enum",
+              "default": "3",
+              "choices": [
+                {
+                  "label": "Nearest",
+                  "value": "0"
+                },
+                {
+                  "label": "Negative",
+                  "value": "1"
+                },
+                {
+                  "label": "Positive",
+                  "value": "2"
+                },
+                {
+                  "label": "Chop / Zero",
+                  "value": "3"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/CPU/Recompiler/VU1ClampMode",
+              "label": "settings_nethersx2_emucore_cpu_recompiler_vu1clampmode",
+              "type": "enum",
+              "default": "1",
+              "choices": [
+                {
+                  "label": "None",
+                  "value": "0"
+                },
+                {
+                  "label": "Normal",
+                  "value": "1"
+                },
+                {
+                  "label": "Extra",
+                  "value": "2"
+                },
+                {
+                  "label": "Extra + Preserve Sign",
+                  "value": "3"
+                }
+              ],
+              "restart": true
+            },
+            {
+              "key": "EmuCore/CPU/Recompiler/EnableVU1",
+              "label": "settings_nethersx2_emucore_cpu_recompiler_enablevu1",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/CPU/Recompiler/EnableIOP",
+              "label": "settings_nethersx2_emucore_cpu_recompiler_enableiop",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/EnableGameFixes",
+              "label": "settings_nethersx2_emucore_enablegamefixes",
+              "type": "bool",
+              "default": "true",
+              "restart": true
+            }
+          ]
+        },
+        {
+          "title": "settings_nethersx2_section_gamefixes",
+          "options": [
+            {
+              "key": "EmuCore/Gamefixes/FpuMulHack",
+              "label": "settings_nethersx2_emucore_gamefixes_fpumulhack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/FpuNegDivHack",
+              "label": "settings_nethersx2_emucore_gamefixes_fpunegdivhack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/SoftwareRendererFMVHack",
+              "label": "settings_nethersx2_emucore_gamefixes_softwarerendererfmvhack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/SkipMPEGHack",
+              "label": "settings_nethersx2_emucore_gamefixes_skipmpeghack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/GoemonTlbHack",
+              "label": "settings_nethersx2_emucore_gamefixes_goemontlbhack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/EETimingHack",
+              "label": "settings_nethersx2_emucore_gamefixes_eetiminghack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/InstantDMAHack",
+              "label": "settings_nethersx2_emucore_gamefixes_instantdmahack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/OPHFlagHack",
+              "label": "settings_nethersx2_emucore_gamefixes_ophflaghack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/GIFFIFOHack",
+              "label": "settings_nethersx2_emucore_gamefixes_giffifohack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/DMABusyHack",
+              "label": "settings_nethersx2_emucore_gamefixes_dmabusyhack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/VIF1StallHack",
+              "label": "settings_nethersx2_emucore_gamefixes_vif1stallhack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/VIFFIFOHack",
+              "label": "settings_nethersx2_emucore_gamefixes_viffifohack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/FullVU0SyncHack",
+              "label": "settings_nethersx2_emucore_gamefixes_fullvu0synchack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/IbitHack",
+              "label": "settings_nethersx2_emucore_gamefixes_ibithack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/VuAddSubHack",
+              "label": "settings_nethersx2_emucore_gamefixes_vuaddsubhack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/VUOverflowHack",
+              "label": "settings_nethersx2_emucore_gamefixes_vuoverflowhack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/VUSyncHack",
+              "label": "settings_nethersx2_emucore_gamefixes_vusynchack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/XgKickHack",
+              "label": "settings_nethersx2_emucore_gamefixes_xgkickhack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            },
+            {
+              "key": "EmuCore/Gamefixes/BlitInternalFPSHack",
+              "label": "settings_nethersx2_emucore_gamefixes_blitinternalfpshack",
+              "type": "bool",
+              "default": "false",
+              "restart": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

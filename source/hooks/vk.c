@@ -190,7 +190,18 @@ void vk_lsfg_request_enabled(int enabled) {
 }
 
 static const char *lsfg_dll_path(void) {
+#ifdef NETHERSX2_TICO
+  // tico's emulators share one copy; the standalone install's is found too
+  static const char *const candidates[] = {
+    "/tico/system/lsfg/Lossless.dll", DATA_ROOT "/lsfg/Lossless.dll",
+    "/switch/nethersx2/lsfg/Lossless.dll",
+  };
+  for (unsigned i = 0; i < sizeof(candidates) / sizeof(*candidates); i++)
+    if (access(candidates[i], R_OK) == 0) return candidates[i];
+  return candidates[0];
+#else
   return DATA_ROOT "/lsfg/Lossless.dll";
+#endif
 }
 
 static int file_readable(const char *path) {

@@ -11,6 +11,7 @@
 #include "config.h"
 #include "prefs.h"
 #include "tico/tico_entry.h"
+#include "tico/tico_settings.h"
 
 /* The standalone NetherSX2_nx install, used when this build has no core */
 #define STANDALONE_ROOT "/switch/nethersx2"
@@ -190,6 +191,7 @@ bool tico_prepare(int argc, char **argv) {
   prefs_remove("Wrapper/LauncherPath");
   prefs_remove("Wrapper/GameConfigPath");
   prefs_remove("Wrapper/GameCRCPath");
+  tico_settings_apply(rom);
   /* the renderer this NRO was built for */
   char renderer[8];
   snprintf(renderer, sizeof(renderer), "%d", GS_RENDERER);

@@ -38,6 +38,9 @@ for build in 4248 3668; do
   }
   rm -rf "$WORK/romfs/res/$build/shaders/dx11"
 done
+# the settings definition, which the host applies to its prefs
+mkdir -p "$WORK/romfs/module"
+cp -f "$MODULE_SRC/settings.json" "$WORK/romfs/module/"
 
 echo "==== storage dependencies ===="
 DEPS_BUILD="$APP/launcher/dependencies/build"

@@ -32,6 +32,7 @@ APP_AUTHOR	:=	naga, hazevauks
 APP_VERSION	:=	0.1.0
 BUILD		:=	build_tico
 SOURCES		+=	source/tico
+INCLUDES	+=	third_party/tico
 RENDERER	:=	VK
 endif
 
