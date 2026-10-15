@@ -84,7 +84,26 @@ upstream.
   (BIOS at its top level, `resources/`, `cheats/`, `nethersx2.ini`,
   `tico.log`); memory cards and states in the account's folders from the
   launch template; Lossless.dll in `/tico/system/lsfg/`.
-- Upstream's quick menu (L + R + Plus) still runs; its Exit goes back to tico.
+- tico's in-game menu (phase 4, first cut): Plus + Minus opens the overlay of
+  tico-drasticDS (`source/tico/overlay`, ImGui), drawn before eglSwapBuffers
+  (OpenGL, ImGui's GLES3 backend: the core uses VAOs) or in a render pass of
+  its own before vkQueuePresentKHR (`source/tico/tico_vk_present.c`). Glue in
+  `source/tico/tico_menu.cpp`; upstream's L + R + Plus menu is off in the
+  tico build.
+- States: overlay slots 1-5 are the core's slots 1-5, the auto slot is the
+  core's slot 10 (files `<serial> (<CRC>).NN.p2s` in the account's states
+  folder; the picture is `Screenshot.png` inside the zip). The auto save is
+  written on Exit, Restart, HOME and closing; the core's own resume state is
+  no longer written. `pauseVM`/`saveStateSlot`/`loadStateSlot` queue work on
+  the core's VM thread.
+- Unknown until tested: whether the core keeps presenting while paused. The
+  menu checks the first time it opens; when frames stop it lets the game run
+  behind the menu and logs it (`menu: the core stops presenting...`).
+- Cheats: `sdmc:/tico/cheats/ps2/<game file name>.pnach` is copied to
+  `<system>/cheats/<CRC>.pnach` with every cheat off at each start.
+- Without TicoSecure the menu reads tico's display/general settings from the
+  plain files when present (theme, Continue Last Game default "ask"); the
+  avatar and nickname come from the account in tico's saves path.
 
 ## Hardware test 1 (2026-10-15): passed
 
@@ -101,3 +120,17 @@ Emulators and Consoles; the settings screen shows; Exit returns to tico with
 no crash. tico passes the account folders as
 `sdmc:/tico/saves/users/<uid>/ps2/` (same for states).
 The OpenGL renderers were not reported.
+
+## Hardware test 2 (pending): the in-game menu
+
+Copy `SD_CARD/tico` over the previous one. With Silent Hill 3 on Vulkan:
+1. Plus + Minus opens the menu; the same closes it. Does the game pause?
+2. Save State to slot 1, then Load State: the slot shows a picture and time,
+   and loading works.
+3. Settings: change Resolution scale (applies at once); Renderer says Use
+   Restart to apply; Restart relaunches the game.
+4. Reset; then Exit Game returns to tico.
+5. Start the game again: it offers to continue from the auto save.
+6. Press HOME in game, return, then close the game from HOME.
+7. Repeat 1-2 with Renderer: OpenGL (NVC0).
+Send back `tico.log`, and a photo of the menu if anything looks wrong.
