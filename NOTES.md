@@ -178,10 +178,32 @@ showed the slot-10 auto save mostly not confirmed within 5 s, and one launch
 (Shadow of the Colossus, Vulkan) stopped at the Continue prompt: the hold's
 acquire waited forever.
 
-## Hardware test 4 (pending)
+## Hardware test 4 (2026-10-15)
 
 1. Exit and Restart several times (both games, Vulkan and OpenGL).
 2. Save to slot 1, then load it from a later point; check the picture.
 3. Exit, start again: Continue loads where Exit left off.
 Send back `tico.log` (states and shutdown steps are logged) and any
 `/atmosphere/crash_reports` file.
+
+Result: states save and load; slot pictures are right (a fresh save takes a
+moment to show); Continue works but showed no picture; Exit and Restart
+mostly work but now and then drop to the HOME menu (no Atmosphère report).
+
+Why the HOME menu: crash.c ended the process with svcExitProcess on a real
+fault, silently. Now `<system>/crash.log` gets the fault (pc, lr, far, esr)
+and the frame chain as `host+0x...` (this NRO: addr2line on the CI's
+`tico-nethersx2_debug` ELF of that build; kept in `_refs/elf/<run id>/`) or
+`core+0x...` (libemucore.so); abort() from the core is logged too and goes
+back to tico. Likely cause, fixed: the exit path set the overlay's hook
+pointers to NULL while the core's thread could be calling them; the hooks
+now stay set and `tico_overlay_stop()` stops the overlay under its lock.
+Continue's picture: the resume state has none, so the frame the menu froze
+for Exit/Restart is written beside it (`<serial> (<CRC>).resume.picture`).
+
+## Hardware test 5 (pending)
+
+1. Exit and Restart many times (both games, both renderers).
+2. After Exit, Continue shows a picture.
+3. On any drop to the HOME menu, send `/tico/system/nethersx2/crash.log`
+   with `tico.log`.
