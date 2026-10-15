@@ -337,6 +337,14 @@ static int stream_is_running(AAudioStream *s) {
          !__atomic_load_n(&s->closing, __ATOMIC_ACQUIRE);
 }
 
+// Set while tico's menu holds the game: silence instead of the core's audio,
+// which stops coming (and would starve the callback) until it closes.
+static volatile int s_muted;
+
+void aaudio_set_muted(int muted) {
+  __atomic_store_n(&s_muted, muted ? 1 : 0, __ATOMIC_RELEASE);
+}
+
 static void *playback_thread(void *arg) {
   AAudioStream *s = (AAudioStream *)arg;
 
@@ -368,8 +376,11 @@ static void *playback_thread(void *arg) {
     void *block = (uint8_t *)s->ring + (size_t)s->next_buf * s->block_bytes;
     void *cb_dst = block;
 
-    aaudio_data_callback_result_t cr =
-        s->data_cb((AAudioStream *)s, s->data_user, cb_dst, s->frames_per_cb);
+    aaudio_data_callback_result_t cr = AAUDIO_CALLBACK_RESULT_CONTINUE;
+    if (__atomic_load_n(&s_muted, __ATOMIC_ACQUIRE))
+      memset(cb_dst, 0, s->block_bytes);
+    else
+      cr = s->data_cb((AAudioStream *)s, s->data_user, cb_dst, s->frames_per_cb);
 
     if (!stream_is_running(s))
       break;

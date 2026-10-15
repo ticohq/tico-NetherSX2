@@ -1,7 +1,7 @@
 // tico's in-game menu for the NetherSX2 host, after tico-drasticDS's
 // tico_menu.cpp. The overlay draws on the core's presenting thread; the menu
 // runs on the host's input thread, carrying out what the overlay returns with
-// the game paused, and takes the overlay's lock around every call into it.
+// the game held, and takes the overlay's lock around every call into it.
 
 #include <switch.h>
 
@@ -26,6 +26,8 @@ extern "C" {
 #include "tico/tico_entry.h"
 #include "tico/tico_menu.h"
 #include "tico/tico_settings.h"
+#include "tico/overlay_hook.h"
+#include "aaudio.h"
 #ifdef USE_VULKAN
 #include "hooks/vk.h"
 #endif
@@ -42,15 +44,17 @@ namespace TicoConfig = SwitchFrontend::TicoConfig;
 
 namespace {
 
-// The overlay's slots 1..5 are the core's 1..5; its auto slot is the core's
-// slot 10, which the core's own menus never offer.
+// The overlay's slots 1..5 are the core's first five, 0..4 (NetherSX2 counts
+// its slots from 0); its auto slot is the core's slot 10, past the 0..9 the
+// core's own menus offer.
 constexpr int kOverlaySlots = OverlayUI::kAutoStateSlot;
 constexpr int kAutoCoreSlot = 10;
 constexpr u64 kAutoSaveTimeoutMs = 5000;
 constexpr u64 kRepeatDelayMs = 400;
 constexpr u64 kRepeatRateMs = 80;
-// frames the game shows before the auto save is offered
-constexpr int kResumeOfferFrames = 30;
+// frames the game shows, once the core names it, before the auto save is
+// offered: past the boot logos' first frames
+constexpr int kResumeOfferFrames = 60;
 constexpr u64 kToggleCombo = HidNpadButton_Plus | HidNpadButton_Minus;
 constexpr const char* kTicoCheatsDir = "sdmc:/tico/cheats/ps2/";
 
@@ -76,7 +80,7 @@ u64 NowMs() {
 }
 
 int CoreSlot(int overlay_slot) {
-    return overlay_slot == OverlayUI::kAutoStateSlot ? kAutoCoreSlot : overlay_slot;
+    return overlay_slot == OverlayUI::kAutoStateSlot ? kAutoCoreSlot : overlay_slot - 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -237,7 +241,6 @@ std::string ControllerName(HidNpadIdType id) {
 struct Menu {
     TicoMenuCore core{};
     bool open = false;
-    bool paused = false;
     bool exit_requested = false;
     bool restart_requested = false;
     NavRepeat repeat;
@@ -249,15 +252,10 @@ struct Menu {
     bool game_known = false;
     bool cheats_imported = false;
     bool resume_offered = false;
-
-    // Whether the core keeps presenting while paused, which the menu needs to
-    // be drawn: checked the first time; when it does not, the menu leaves the
-    // game running behind it (with no input).
-    enum class PauseMode { Unknown, Works, Soft };
-    PauseMode pause_mode = PauseMode::Unknown;
-    u64 pause_check_at = 0;
-    int pause_check_frames = 0;
-    int pause_check_stage = 0;
+    // frames presented when the core named the game
+    int frames_at_game = -1;
+    // the values of the options read only at launch (Use Restart to apply)
+    std::vector<std::pair<std::string, std::string>> launch_values;
 
     NxCheatList cheats{};
     std::string cheat_path;
@@ -271,14 +269,12 @@ struct Menu {
         return game_known;
     }
 
-    void Pause(bool pause) {
-        if (pause == paused)
-            return;
-        if (pause && pause_mode == PauseMode::Soft)
-            return;
-        paused = pause;
-        if (core.pause)
-            core.pause(pause);
+    // The core's own pause stops its frames, and the menu with them: instead
+    // the presenting thread stays in the present while the menu is open
+    // (tico/overlay_hook.h), which stalls the core within a frame or two.
+    void Hold(bool hold) {
+        __atomic_store_n(&tico_overlay_hold, hold ? 1 : 0, __ATOMIC_RELEASE);
+        aaudio_set_muted(hold);
     }
 
     void Open() {
@@ -288,53 +284,20 @@ struct Menu {
         repeat = {};
         if (core.release_inputs)
             core.release_inputs();
-        Pause(true);
-        if (pause_mode == PauseMode::Unknown && paused) {
-            pause_check_stage = 1;
-            pause_check_at = NowMs() + 250;
+        {
+            auto lock = Lock();
+            ImGuiOverlay::SetVisible(true);
         }
-        auto lock = Lock();
-        ImGuiOverlay::SetVisible(true);
+        Hold(true);
     }
 
-    void Close(bool resume) {
+    void Close() {
         if (!open)
             return;
         open = false;
-        {
-            auto lock = Lock();
-            ImGuiOverlay::SetVisible(false);
-        }
-        if (resume)
-            Pause(false);
-    }
-
-    // A pause that stops the core's frames would freeze the menu: the first
-    // time, look whether frames keep coming, and if not run the game on.
-    void CheckPause() {
-        if (!pause_check_stage || NowMs() < pause_check_at || !core.presented_frames)
-            return;
-        if (pause_check_stage == 1) {
-            pause_check_frames = core.presented_frames();
-            pause_check_stage = 2;
-            pause_check_at = NowMs() + 400;
-            return;
-        }
-        pause_check_stage = 0;
-        const int frames = core.presented_frames() - pause_check_frames;
-        if (frames >= 4) {
-            pause_mode = PauseMode::Works;
-            tico_log("menu: the core presents while paused (%d frames in 400 ms)\n", frames);
-            return;
-        }
-        pause_mode = PauseMode::Soft;
-        tico_log("menu: the core stops presenting while paused (%d frames in 400 ms); "
-                 "the game runs behind the menu\n", frames);
-        if (paused) {
-            paused = false;
-            if (core.pause)
-                core.pause(false);
-        }
+        Hold(false);
+        auto lock = Lock();
+        ImGuiOverlay::SetVisible(false);
     }
 
     // -----------------------------------------------------------------------
@@ -388,16 +351,19 @@ struct Menu {
         return preview;
     }
 
-    void SaveState(int core_slot) {
+    // The core saves and loads on its own thread, which runs again once the
+    // menu closes: the state is the frame the menu froze.
+    void SaveState(int overlay_slot) {
         const bool known = GameKnown();
         if (known && core.save_state)
-            core.save_state(core_slot);
+            core.save_state(CoreSlot(overlay_slot));
         auto lock = Lock();
         OverlayUI::ShowToast(
-            TrFormat(known ? "nethersx2_saving_state" : "nethersx2_save_failed", core_slot));
+            TrFormat(known ? "nethersx2_saving_state" : "nethersx2_save_failed", overlay_slot));
     }
 
-    void LoadState(int core_slot) {
+    void LoadState(int overlay_slot) {
+        const int core_slot = CoreSlot(overlay_slot);
         const bool present = SlotOccupied(core_slot);
         if (present && core.load_state)
             core.load_state(core_slot);
@@ -406,17 +372,14 @@ struct Menu {
             OverlayUI::ShowToast(Tr("emulator_auto_loaded"));
         else
             OverlayUI::ShowToast(
-                TrFormat(present ? "nethersx2_state_loaded" : "nethersx2_load_failed", core_slot));
+                TrFormat(present ? "nethersx2_state_loaded" : "nethersx2_load_failed", overlay_slot));
     }
 
     void AutoSave() {
         if (!GameKnown() || !core.save_state)
             return;
         // the core saves on its own thread, which must be running
-        Close(false);
-        if (core.pause)
-            core.pause(false);
-        paused = false;
+        Close();
         const std::string path = StatePath(kAutoCoreSlot);
         struct stat before {};
         const bool existed = stat(path.c_str(), &before) == 0;
@@ -453,7 +416,7 @@ struct Menu {
         if (mode == "never")
             return;
         if (mode == "always") {
-            LoadState(kAutoCoreSlot);
+            LoadState(OverlayUI::kAutoStateSlot);
             return;
         }
         Open();
@@ -538,11 +501,26 @@ struct Menu {
 
     // -----------------------------------------------------------------------
 
+    // The values of the options read only at launch, kept while the game runs:
+    // the core applies some of them at once (a renderer change freezes it).
+    void RememberLaunchValues() {
+        launch_values.clear();
+        for (const TicoConfig::OptionCategory& category : TicoConfig::GetCategories())
+            for (std::size_t i = 0; i < category.option_count; i++) {
+                const TicoConfig::OptionDef& option = category.options[i];
+                if (option.needs_restart && std::strchr(option.key, '/'))
+                    launch_values.emplace_back(option.key, prefs_get_string(option.key, ""));
+            }
+        launch_values.emplace_back("Wrapper/GLDriver", prefs_get_string("Wrapper/GLDriver", ""));
+    }
+
     void ApplySettings() {
         // per-game settings may have been saved or deleted: the values that
         // now apply go to the prefs the core and host read
         TicoConfig::ApplyToPrefs();
         tico_settings_derive();
+        for (const auto& [key, value] : launch_values)
+            prefs_set_string(key.c_str(), value.c_str());
         if (core.apply_settings)
             core.apply_settings();
 #ifdef USE_VULKAN
@@ -588,25 +566,27 @@ struct Menu {
 
     void RunAction(OverlayUI::Action action) {
         using OverlayUI::Action;
+        if (action != Action::None)
+            tico_log("menu: action %d\n", static_cast<int>(action));
         switch (action) {
         case Action::None:
             return;
         case Action::Resume:
-            Close(true);
+            Close();
             return;
         case Action::Exit:
             exit_requested = true;
-            Close(false);
+            Close();
             return;
         case Action::Reset:
             if (core.reset)
                 core.reset();
-            Close(true);
+            Close();
             return;
         case Action::Restart:
             restart_requested = true;
             exit_requested = true;
-            Close(false);
+            Close();
             return;
         case Action::EditText:
             EditText();
@@ -618,11 +598,11 @@ struct Menu {
             break;
         }
         if (OverlayUI::IsSaveStateAction(action)) {
-            SaveState(CoreSlot(OverlayUI::GetStateSlotForAction(action)));
-            Close(true);
+            SaveState(OverlayUI::GetStateSlotForAction(action));
+            Close();
         } else if (OverlayUI::IsLoadStateAction(action)) {
-            LoadState(CoreSlot(OverlayUI::GetStateSlotForAction(action)));
-            Close(true);
+            LoadState(OverlayUI::GetStateSlotForAction(action));
+            Close();
         }
     }
 
@@ -647,7 +627,7 @@ struct Menu {
         if (!open)
             return true;
         if (toggle) {
-            Close(true);
+            Close();
             return true;
         }
         HidTouchScreenState touch{};
@@ -672,13 +652,13 @@ struct Menu {
     }
 
     void Tick() {
-        CheckPause();
-        if (!GameKnown())
+        if (!GameKnown() || !core.presented_frames)
             return;
+        if (frames_at_game < 0)
+            frames_at_game = core.presented_frames();
         if (!cheats_imported)
             ImportTicoCheats();
-        if (!resume_offered && core.presented_frames &&
-            core.presented_frames() >= kResumeOfferFrames)
+        if (!resume_offered && core.presented_frames() - frames_at_game >= kResumeOfferFrames)
             OfferResume();
     }
 };
@@ -694,6 +674,7 @@ void tico_menu_init(const TicoMenuCore* core, bool vulkan) {
         return;
     s_menu = new Menu();
     s_menu->core = *core;
+    s_menu->RememberLaunchValues();
     Menu* menu = s_menu;
     auto lock = Lock();
     OverlayUI::ReloadSettings();

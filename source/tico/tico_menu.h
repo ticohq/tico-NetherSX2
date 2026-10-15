@@ -14,9 +14,8 @@ extern "C" {
 #endif
 
 /* What the menu asks of the core; main.c fills it in with the NativeLibrary
- * calls. State slots are the core's (1..10). */
+ * calls. State slots are the core's (0..10). */
 typedef struct {
-  void (*pause)(bool paused);
   void (*save_state)(int slot);
   void (*load_state)(int slot);
   void (*reset)(void);

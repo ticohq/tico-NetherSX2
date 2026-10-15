@@ -68,6 +68,8 @@
   "settings_nethersx2_section_network": "Network (experimental)",
   "settings_nethersx2_wrapper_network": "Network adapter",
   "settings_nethersx2_wrapper_netdns": "Custom DNS server",
+  "settings_nethersx2_section_interface": "Interface",
+  "settings_nethersx2_menu_theme": "In-game menu theme",
   "settings_nethersx2_tab_controls": "Controls",
   "settings_nethersx2_section_controller": "Controller",
   "settings_nethersx2_wrapper_controllercount": "Controller ports",

@@ -38,6 +38,7 @@
 #include "../prefs.h"
 #include "../lsfg/lsfg_bridge.h"
 #ifdef NETHERSX2_TICO
+#include "../tico/overlay_hook.h"
 #include "../tico/tico_vk_present.h"
 #endif
 
@@ -139,6 +140,7 @@ static uint32_t         lsfg_main_queue_family = VK_QUEUE_FAMILY_IGNORED;
 static VkSwapchainKHR tracked_swapchain;
 static VkExtent2D     tracked_swapchain_extent;
 static VkFormat       tracked_swapchain_format;
+static int            tracked_swapchain_copyable;
 static int            tracked_swapchain_lsfg_compatible;
 
 static LsfgNxRuntime *lsfg_runtime;
@@ -627,8 +629,20 @@ vkCreateSwapchainKHR_shim(VkDevice device,
   VkSwapchainCreateInfoKHR modified = *create_info;
   int compatible = 0;
 #ifdef NETHERSX2_TICO
-  // the tico overlay draws onto the presented image in a render pass
+  // the tico overlay draws onto the presented image in a render pass, and
+  // copies it as the menu's frozen background when the surface allows
   modified.imageUsage |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+  int copyable = 0;
+  {
+    VkSurfaceCapabilitiesKHR surface_caps;
+    if (tracked_physical_device &&
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(tracked_physical_device, create_info->surface,
+                                                  &surface_caps) == VK_SUCCESS &&
+        (surface_caps.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_SRC_BIT)) {
+      modified.imageUsage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+      copyable = 1;
+    }
+  }
 #endif
   const int requested = lsfg_requested();
   const int want_lsfg = lsfg_device_capable;
@@ -682,6 +696,9 @@ vkCreateSwapchainKHR_shim(VkDevice device,
     tracked_swapchain = *out;
     tracked_swapchain_extent = create_info->imageExtent;
     tracked_swapchain_format = create_info->imageFormat;
+#ifdef NETHERSX2_TICO
+    tracked_swapchain_copyable = copyable;
+#endif
     tracked_swapchain_lsfg_compatible = compatible;
     __atomic_store_n(&lsfg_runtime_available, compatible, __ATOMIC_RELEASE);
   }
@@ -802,7 +819,13 @@ vkQueuePresentKHR_shim(VkQueue q, const VkPresentInfoKHR *pi) {
   if (tracked_swapchain && find_queue_family(q, &overlay_family)) {
     const TicoVkSwapchainInfo overlay_swapchain = {
         tracked_instance, tracked_physical_device, tracked_device, tracked_swapchain,
-        tracked_swapchain_format, tracked_swapchain_extent, overlay_family};
+        tracked_swapchain_format, tracked_swapchain_extent, overlay_family,
+        tracked_swapchain_copyable};
+    // the menu is open: stay here, presenting it over the frozen frame
+    VkResult held = VK_SUCCESS;
+    if (__atomic_load_n(&tico_overlay_hold, __ATOMIC_ACQUIRE) && !lsfg_runtime &&
+        tico_vk_overlay_hold(q, pi, &overlay_swapchain, vkQueuePresentKHR_native, &held))
+      return held;
     if (tico_vk_overlay_present(q, pi, &overlay_swapchain, &with_overlay))
       pi = &with_overlay;
   }

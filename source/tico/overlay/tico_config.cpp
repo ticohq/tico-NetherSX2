@@ -16,6 +16,8 @@
 #include <string_view>
 #include <sys/stat.h>
 
+#include <switch.h>
+
 #include <json.hpp>
 
 #include "../TicoSession.h"
@@ -166,6 +168,8 @@ std::optional<bool> ParseBool(std::string_view value) {
 
 constexpr const char* kSettingsPath = "romfs:/module/settings.json";
 constexpr const char* kSlug = "ps2";
+// The in-game menu's theme when tico's is not known (settings.json)
+constexpr const char* kMenuThemeKey = "nethersx2_menu_theme";
 
 // Listed only in game: tico cannot see the shaders on the SD card.
 constexpr const char* kShaderKey = "Wrapper/CustomShader";
@@ -673,11 +677,27 @@ int BorderTint() {
 
 bool DarkMode() {
     std::string content;
-    if (!tico::ReadSettings("display", content)) {
-        return false;
+    if (tico::ReadSettings("display", content)) {
+        const nlohmann::json root = nlohmann::json::parse(StripJsonComments(content), nullptr, false);
+        if (!root.is_discarded() && root.is_object() && root.contains("dark_mode") &&
+            root["dark_mode"].is_boolean()) {
+            return root["dark_mode"].get<bool>();
+        }
     }
-    const nlohmann::json root = nlohmann::json::parse(StripJsonComments(content), nullptr, false);
-    return !root.is_discarded() && root.is_object() && root.value("dark_mode", false);
+    // A module gets no session, so tico's theme is not known: the module's
+    // own setting, else the console's theme
+    const std::string theme = GetManager().GetConfigValue(kMenuThemeKey, "system");
+    if (theme == "dark" || theme == "light") {
+        return theme == "dark";
+    }
+    ColorSetId color_set = ColorSetId_Light;
+    if (R_SUCCEEDED(setsysInitialize())) {
+        if (R_FAILED(setsysGetColorSetId(&color_set))) {
+            color_set = ColorSetId_Light;
+        }
+        setsysExit();
+    }
+    return color_set == ColorSetId_Dark;
 }
 
 std::string ResumeOnLaunch() {

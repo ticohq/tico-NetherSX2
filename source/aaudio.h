@@ -103,4 +103,7 @@ int64_t AAudioStream_getFramesRead(AAudioStream *s);
 aaudio_result_t AAudioStream_waitForStateChange(AAudioStream *s, aaudio_stream_state_t inputState,
                                                 aaudio_stream_state_t *nextState, int64_t timeoutNanoseconds);
 
+// Plays silence instead of the core's audio while set (tico's menu).
+void aaudio_set_muted(int muted);
+
 #endif

@@ -44,6 +44,27 @@ RESTART_KEYS = {
 }
 RESTART_PREFIXES = ("EmuCore/CPU/", "EmuCore/Gamefixes/", "SPU2/Output/")
 
+# The module's own options, after the launcher's: keys without a section
+# are the menu's, not nethersx2.ini's.
+OWN_SECTIONS = {
+    "system": [{
+        "id": "interface",
+        "title": "Interface",
+        "options": [{
+            "key": "nethersx2_menu_theme",
+            "label": "settings_nethersx2_menu_theme",
+            "text": "In-game menu theme",
+            "type": "enum",
+            "default": "system",
+            "choices": [
+                {"label": "Console theme", "value": "system"},
+                {"label": "Light", "value": "light"},
+                {"label": "Dark", "value": "dark"},
+            ],
+        }],
+    }],
+}
+
 STRING = r'"((?:[^"\\]|\\.)*)"'
 
 
@@ -183,6 +204,12 @@ def main():
             options = [o for o in (option(m, a, choices, strings, prefix)
                                    for m, a in tables[table]) if o]
             tab["sections"].append({"title": section_key, "options": options})
+        for section in OWN_SECTIONS.get(tab_id, []):
+            section_key = f"{prefix}_section_{section['id']}"
+            strings[section_key] = section["title"]
+            for own in section["options"]:
+                strings[own["label"]] = own.pop("text")
+            tab["sections"].append({"title": section_key, "options": section["options"]})
         tabs.append(tab)
     settings = {
         "core_id": "nethersx2",

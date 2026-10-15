@@ -215,7 +215,6 @@ static struct {
   void (*addKeyedOSDMessage)(void *env, void *cls, void *key, void *message, float duration);
   void (*saveStateSlot)(void *env, void *cls, int slot);
   void (*loadStateSlot)(void *env, void *cls, int slot);
-  void (*pauseVM)(void *env, void *cls, jbool paused);
   void (*toggleLimiterMode)(void *env, void *cls, int mode);
   void (*reloadPatches)(void *env, void *cls);
   void (*setPadValue)(void *env, void *cls, int controller, int bind, float value);
@@ -253,7 +252,6 @@ static void resolve_entry_points(void) {
   RESOLVE(addKeyedOSDMessage,          NLSYM("addKeyedOSDMessage"));
   RESOLVE(saveStateSlot,               NLSYM("saveStateSlot"));
   RESOLVE(loadStateSlot,               NLSYM("loadStateSlot"));
-  nl.pauseVM = (void *)so_try_find_addr_rx(&emu_mod, NLSYM("pauseVM"));
   RESOLVE(toggleLimiterMode,           NLSYM("toggleLimiterMode"));
   nl.reloadPatches = (void *)so_try_find_addr_rx(&emu_mod, NLSYM("reloadPatches"));
   // setPadValue drives the emulated DualShock2 DIRECTLY (this is what AetherSX2's
@@ -1889,9 +1887,6 @@ static void update_touch(void) {
 }
 
 #ifdef NETHERSX2_TICO
-static void tico_core_pause(bool paused) {
-  if (nl.pauseVM) nl.pauseVM(fake_env, NATIVE_CLASS, paused ? 1 : 0);
-}
 static void tico_core_save_state(int slot) {
   nl.saveStateSlot(fake_env, NATIVE_CLASS, slot);
 }
@@ -2067,7 +2062,6 @@ int main(int argc, char **argv) {
 #ifdef NETHERSX2_TICO
   {
     const TicoMenuCore menu_core = {
-      .pause = tico_core_pause,
       .save_state = tico_core_save_state,
       .load_state = tico_core_load_state,
       .reset = tico_core_reset,
@@ -2164,8 +2158,11 @@ int main(int argc, char **argv) {
   tico_gl_overlay_hook = NULL;
   tico_overlay_wants_frame = NULL;
   // Exit Game and the game ending on its own go back to tico, Restart here
-  if (!(tico_menu_take_restart_request() && tico_queue_restart()))
-    tico_queue_return();
+  const bool restart = tico_menu_take_restart_request();
+  const bool queued = restart ? tico_queue_restart() : tico_queue_return();
+  tico_log("exit: %s %s\n", restart ? "restart" : "back to tico",
+           queued ? "queued" : "could not be queued");
+  if (restart && !queued) tico_queue_return();
 #else
   const int has_next_load = envHasNextLoad();
   const char *launcher_path = prefs_get_string("Wrapper/LauncherPath", "");

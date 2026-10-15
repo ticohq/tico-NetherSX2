@@ -2173,6 +2173,31 @@
               "restart": true
             }
           ]
+        },
+        {
+          "title": "settings_nethersx2_section_interface",
+          "options": [
+            {
+              "key": "nethersx2_menu_theme",
+              "label": "settings_nethersx2_menu_theme",
+              "type": "enum",
+              "default": "system",
+              "choices": [
+                {
+                  "label": "Console theme",
+                  "value": "system"
+                },
+                {
+                  "label": "Light",
+                  "value": "light"
+                },
+                {
+                  "label": "Dark",
+                  "value": "dark"
+                }
+              ]
+            }
+          ]
         }
       ]
     },

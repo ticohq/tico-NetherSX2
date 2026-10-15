@@ -36,6 +36,19 @@ extern TicoVkOverlayHook tico_vk_overlay_hook;
 extern TicoGlOverlayHook tico_gl_overlay_hook;
 extern TicoOverlayWantsFrame tico_overlay_wants_frame;
 
+/* Set while the menu is open: the presenting thread then stays in the
+ * present, drawing the menu over a frozen copy of the game's last frame,
+ * which stalls the core until the menu closes (the core's own pause stops
+ * its presents, which would freeze the menu with it). */
+extern volatile int tico_overlay_hold;
+
+/* The frozen frame drawn under the menu (an ImGui texture id: a GL texture,
+ * or a Vulkan descriptor set from tico_overlay_vk_add_texture); 0 clears. */
+void tico_overlay_set_background(unsigned long long texture, float u0, float v0, float u1,
+                                 float v1);
+unsigned long long tico_overlay_vk_add_texture(VkSampler sampler, VkImageView view);
+void tico_overlay_vk_remove_texture(unsigned long long texture);
+
 #ifdef __cplusplus
 }
 #endif

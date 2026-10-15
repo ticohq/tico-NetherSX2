@@ -294,8 +294,12 @@ void tico_log(const char *format, ...) {
   static FILE *file;
   if (!file) {
     make_path(DATA_ROOT);
-    file = fopen(TICO_LOG_PATH, "w");
+    /* every launch adds to the log (a Restart's too), kept under 256 KiB */
+    struct stat st;
+    const bool large = stat(TICO_LOG_PATH, &st) == 0 && st.st_size > 256 * 1024;
+    file = fopen(TICO_LOG_PATH, large ? "w" : "a");
     if (!file) return;
+    fprintf(file, "---- tico-nethersx2 " NETHERSX2_VERSION " ----\n");
   }
   va_list arguments;
   va_start(arguments, format);

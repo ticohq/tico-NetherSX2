@@ -326,6 +326,39 @@ EGLBoolean eglSwapIntervalHook(EGLDisplay dpy, EGLint interval) {
   return r;
 }
 
+#ifdef NETHERSX2_TICO
+// The menu is open: keep this thread (the core's) here, showing the menu over
+// the frame the core just drew, until it closes. That frame is what the core
+// meant to present, so it goes out last, without the menu, in its place.
+static void tico_hold_in_swap(EGLDisplay dpy, EGLSurface surface, int width, int height) {
+  GLint texture_binding = 0, active_texture = 0;
+  glGetIntegerv(GL_ACTIVE_TEXTURE, &active_texture);
+  glActiveTexture(GL_TEXTURE0);
+  glGetIntegerv(GL_TEXTURE_BINDING_2D, &texture_binding);
+  GLuint frozen = 0;
+  glGenTextures(1, &frozen);
+  glBindTexture(GL_TEXTURE_2D, frozen);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, width, height, 0);
+  glBindTexture(GL_TEXTURE_2D, (GLuint)texture_binding);
+  glActiveTexture((GLenum)active_texture);
+  // a copy of the window is upside down for ImGui
+  tico_overlay_set_background(frozen, 0.0f, 1.0f, 1.0f, 0.0f);
+  while (__atomic_load_n(&tico_overlay_hold, __ATOMIC_ACQUIRE)) {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    tico_gl_overlay_hook(width, height);
+    eglSwapBuffers(dpy, surface);
+  }
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  tico_gl_overlay_hook(width, height);
+  tico_overlay_set_background(0, 0.0f, 0.0f, 1.0f, 1.0f);
+  glDeleteTextures(1, &frozen);
+}
+#endif
+
 EGLBoolean eglSwapBuffersHook(EGLDisplay dpy, EGLSurface surface) {
   ++egl_swap_count;
   if (fake_pbuffer_from_surface(surface))
@@ -343,7 +376,10 @@ EGLBoolean eglSwapBuffersHook(EGLDisplay dpy, EGLSurface surface) {
     GLint framebuffer = 0;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    tico_gl_overlay_hook(width, height);
+    if (__atomic_load_n(&tico_overlay_hold, __ATOMIC_ACQUIRE))
+      tico_hold_in_swap(dpy, surface, width, height);
+    else
+      tico_gl_overlay_hook(width, height);
     glBindFramebuffer(GL_FRAMEBUFFER, (GLuint)framebuffer);
   }
 #endif

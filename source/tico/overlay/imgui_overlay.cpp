@@ -69,6 +69,11 @@ constexpr float kDesignHeight = 720.0f;
 // one: everything the overlay keeps is used under this lock.
 std::recursive_mutex s_mutex;
 bool s_initialized = false;
+// The frame the game was showing when the menu froze it, drawn under the
+// menu while the presenting thread holds (tico/overlay_hook.h); 0 for none.
+unsigned long long s_background = 0;
+ImVec2 s_background_uv0{0.0f, 0.0f};
+ImVec2 s_background_uv1{1.0f, 1.0f};
 bool s_vulkan = false;
 bool s_visible = false;
 bool s_psm_initialized = false;
@@ -245,11 +250,16 @@ void BeginFrame(float width, float height) {
 // Draws the menu or the HUD for this frame. Returns false when there is
 // nothing to draw, so the renderer is left alone.
 bool BuildFrame(float width, float height) {
-    if (!s_visible && !OverlayUI::HasTransientContent()) {
+    if (!s_visible && !OverlayUI::HasTransientContent() && !s_background) {
         return false;
     }
     BeginFrame(width, height);
     ImGui::NewFrame();
+    if (s_background) {
+        ImGui::GetBackgroundDrawList()->AddImage(
+            ImTextureRef(static_cast<ImTextureID>(s_background)), ImVec2(0.0f, 0.0f),
+            ImVec2(width, height), s_background_uv0, s_background_uv1);
+    }
     const OverlayUI::Action action =
         OverlayUI::Render(static_cast<int>(width), static_cast<int>(height));
     ImGui::Render();
@@ -609,7 +619,7 @@ void VulkanHook(const TicoVkOverlayContext* context) {
     if (!s_initialized || !context) {
         return;
     }
-    if (!s_visible && !OverlayUI::HasTransientContent()) {
+    if (!s_visible && !OverlayUI::HasTransientContent() && !s_background) {
         return;
     }
     if (!EnsureVulkanBackend(*context)) {
@@ -687,7 +697,7 @@ void GlHook(int width, int height) {
     if (!s_initialized) {
         return;
     }
-    if (!s_visible && !OverlayUI::HasTransientContent()) {
+    if (!s_visible && !OverlayUI::HasTransientContent() && !s_background) {
         return;
     }
     if (!s_gl_ready) {
@@ -732,7 +742,7 @@ void DestroyGlBackend() {
 
 int WantsFrame() {
     std::lock_guard<std::recursive_mutex> lock(s_mutex);
-    return s_initialized && (s_visible || OverlayUI::HasTransientContent());
+    return s_initialized && (s_visible || OverlayUI::HasTransientContent() || s_background);
 }
 
 } // namespace
@@ -875,3 +885,29 @@ OverlayUI::Action ConsumeAction() {
 }
 
 } // namespace SwitchFrontend::ImGuiOverlay
+
+// The frozen frame under the menu (tico/overlay_hook.h), for the renderers'
+// present hooks.
+extern "C" void tico_overlay_set_background(unsigned long long texture, float u0, float v0,
+                                            float u1, float v1) {
+    std::lock_guard<std::recursive_mutex> lock(SwitchFrontend::ImGuiOverlay::s_mutex);
+    SwitchFrontend::ImGuiOverlay::s_background = texture;
+    SwitchFrontend::ImGuiOverlay::s_background_uv0 = ImVec2(u0, v0);
+    SwitchFrontend::ImGuiOverlay::s_background_uv1 = ImVec2(u1, v1);
+}
+
+extern "C" unsigned long long tico_overlay_vk_add_texture(VkSampler sampler, VkImageView view) {
+    std::lock_guard<std::recursive_mutex> lock(SwitchFrontend::ImGuiOverlay::s_mutex);
+    if (!SwitchFrontend::ImGuiOverlay::s_vk.ready) {
+        return 0;
+    }
+    return reinterpret_cast<unsigned long long>(
+        ImGui_ImplVulkan_AddTexture(sampler, view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+}
+
+extern "C" void tico_overlay_vk_remove_texture(unsigned long long texture) {
+    std::lock_guard<std::recursive_mutex> lock(SwitchFrontend::ImGuiOverlay::s_mutex);
+    if (texture && SwitchFrontend::ImGuiOverlay::s_vk.ready) {
+        ImGui_ImplVulkan_RemoveTexture(reinterpret_cast<VkDescriptorSet>(texture));
+    }
+}
